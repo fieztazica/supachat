@@ -1,21 +1,27 @@
+import { Profile } from './../types/index';
+import { useRouter } from 'next/router';
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { createClient, User, Session, PostgrestResponse } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
+import { Database } from '@/types/supabase';
 
-export const supabase = createClient(
-  `${process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL}`,
-  `${process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
-)
-export const useSupabase =  () => {
-  const [currentUser, setCurrentUser] = useState<User | null | undefined>(null)
+export const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
+);
+
+export const useSupabase = () => {
+  const supabase = useSupabaseClient<Database>();
+
+  const [currentUser, setCurrentUser] = useState<Profile | null | undefined>(null)
   const [session, setSession] = useState<Session | null | undefined>()
 
-  
-// const { data: { user } } = await supabase.auth.getUser()
+  // const { data: { user } } = await supabase.auth.getUser()
 
-
-  supabase.auth.onAuthStateChange(async (_event, session) => {
-    setSession(session as Session | null)
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    console.log(event, session)
+    setSession(session)
   })
 
   useEffect(() => {
@@ -25,7 +31,7 @@ export const useSupabase =  () => {
           const { data: currentUser } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', session.user.id) as PostgrestResponse<User>
+            .eq('id', session.user.id);
 
           if (currentUser?.length) {
             const foundUser = currentUser[0]

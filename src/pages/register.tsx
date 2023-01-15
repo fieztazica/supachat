@@ -35,10 +35,10 @@ import { GetServerSidePropsContext } from "next/types";
 import { useRouter } from "next/router";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import NextLink from "next/link";
+import { useSupabase } from "@/lib/supabaseClient";
 
 function Register() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
+  const { currentUser, session, supabase } = useSupabase();
   const router = useRouter();
   const pwd = useDisclosure();
   const toast = useToast();
@@ -68,12 +68,14 @@ function Register() {
         toast({ title: `${error.message}`, status: "error" });
       }
 
-      if (data.user) {
-        toast({ title: `Successfully signed you up!`, status: "success" });
-        console.log(data);
-      }
-
       console.log(data, error);
+
+      if (data.user) {
+        toast({
+          title: `Successfully signed you up! A confirmation mail should be sent soon!`,
+          status: "success",
+        });
+      }
     },
     validate(values) {
       const errors: any = {};
@@ -101,8 +103,8 @@ function Register() {
   }
 
   useEffect(() => {
-    if (!!session) router.push("/chat");
-  });
+    if (currentUser) router.reload();
+  }, [currentUser]);
 
   return (
     <Flex minH="100vh" align={"center"} justify={"center"}>
@@ -130,9 +132,10 @@ function Register() {
             <form onSubmit={formik.handleSubmit}>
               <Stack direction={["column", "row"]}>
                 <FormControl isRequired>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel htmlFor="full_name">Full Name</FormLabel>
                   <Input
                     name="full_name"
+                    id="full_name"
                     placeholder="Your full name"
                     type={"text"}
                     onChange={formik.handleChange}
@@ -140,8 +143,9 @@ function Register() {
                   />
                 </FormControl>
                 <FormControl isRequired>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel htmlFor="username">Username</FormLabel>
                   <Input
+                    id="username"
                     name="username"
                     placeholder="Your beautiful username"
                     type={"text"}
@@ -152,8 +156,9 @@ function Register() {
               </Stack>
 
               <FormControl isRequired>
-                <FormLabel>Email</FormLabel>
+                <FormLabel htmlFor="email">Email</FormLabel>
                 <Input
+                  id="email"
                   name="email"
                   placeholder="Your email"
                   type={"email"}
@@ -244,25 +249,25 @@ function Register() {
 
 export default Register;
 
-// export const getServerSideProps: GetServerSideProps = async (
-//   ctx: GetServerSidePropsContext
-// ) => {
-//   // Create authenticated Supabase Client
-//   const supabase = createServerSupabaseClient(ctx);
-//   // Check if we have a session
-//   const {
-//     data: { session },
-//   } = await supabase.auth.getSession();
+export const getServerSideProps: GetServerSideProps = async (
+  ctx: GetServerSidePropsContext
+) => {
+  const supabase = await createServerSupabaseClient(ctx);
+  const { data, error } = await supabase.auth.getSession();
 
-//   if (!session)
-//     return {
-//       props: {},
-//     };
+  if (error) {
+    throw new Error(error.message);
+  }
 
-//   return {
-//     redirect: {
-//       destination: "/chat",
-//       permanent: false,
-//     },
-//   };
-// };
+  if (!data.session)
+    return {
+      props: {},
+    };
+
+  return {
+    redirect: {
+      destination: "/chat",
+      permanent: false,
+    },
+  };
+};

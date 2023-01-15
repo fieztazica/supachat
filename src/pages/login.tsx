@@ -22,29 +22,25 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState, useRef } from "react";
-import {
-  SupabaseClient,
-  useSession,
-  useSupabaseClient,
-} from "@supabase/auth-helpers-react";
-import { GetServerSideProps } from "next";
-// import { supabase } from "@/lib/supabaseClient";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { useFormik } from "formik";
 import { FaDiscord } from "react-icons/fa";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import { GetServerSidePropsContext } from "next/types";
-import { useRouter } from "next/router";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import NextLink from "next/link";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
+// import { supabase } from "@/lib/supabaseClient";
+import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/router";
+import ForgotPwd from "@/components/forgotPwd";
 
 function Login() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
+  const { currentUser, session, supabase } = useSupabase();
   const router = useRouter();
   const pwd = useDisclosure();
   const toast = useToast();
-  const [captchaToken, setCaptchaToken] = useState<string>();
+  // const [captchaToken, setCaptchaToken] = useState<string>();
   // const captcha = useRef();
 
   const formik = useFormik({
@@ -56,19 +52,18 @@ function Login() {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: `${values.email}`,
         password: `${values.password}`,
-        options: {
-          captchaToken,
-        },
+        // options: {
+        //   captchaToken,
+        // },
       });
-      // captcha.current.resetCaptcha()
+
       if (error) {
         console.log(error);
         toast({ title: `${error.message}`, status: "error" });
       }
 
-      if (data.session) {
+      if (data.user && data.session) {
         toast({ title: `Successfully logged you in!`, status: "success" });
-        console.log(data);
       }
     },
   });
@@ -85,8 +80,8 @@ function Login() {
   }
 
   useEffect(() => {
-    if (!!session) router.push("/chat");
-  });
+    if (currentUser) router.reload();
+  }, [currentUser]);
 
   return (
     <Flex minH="100vh" align={"center"} justify={"center"}>
@@ -149,9 +144,9 @@ function Login() {
                     Don&#39;t have an account?
                   </Text>
                 </Link>
-                <Link>
+                <ForgotPwd>
                   <Text fontSize={["sm", "md"]}>Forgot password?</Text>
-                </Link>
+                </ForgotPwd>
               </Stack>
               {/* <HCaptcha
                 ref={captcha}
@@ -189,25 +184,25 @@ function Login() {
 
 export default Login;
 
-// export const getServerSideProps: GetServerSideProps = async (
-//   ctx: GetServerSidePropsContext
-// ) => {
-//   // Create authenticated Supabase Client
-//   const supabase = createServerSupabaseClient(ctx);
-//   // Check if we have a session
-//   const {
-//     data: { session },
-//   } = await supabase.auth.getSession();
+export const getServerSideProps: GetServerSideProps = async (
+  ctx: GetServerSidePropsContext
+) => {
+  const supabase = await createServerSupabaseClient(ctx);
+  const { data, error } = await supabase.auth.getSession();
 
-//   if (!session)
-//     return {
-//       props: {},
-//     };
+  if (error) {
+    throw new Error(error.message);
+  }
 
-//   return {
-//     redirect: {
-//       destination: "/chat",
-//       permanent: false,
-//     },
-//   };
-// };
+  if (!data.session)
+    return {
+      props: {},
+    };
+
+  return {
+    redirect: {
+      destination: "/chat",
+      permanent: false,
+    },
+  };
+};

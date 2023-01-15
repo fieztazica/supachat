@@ -1,4 +1,3 @@
-export interface Country {
-    name: String,
-    id: Number
-}
+import { Database } from "./supabase"
+
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
