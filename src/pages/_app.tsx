@@ -15,6 +15,9 @@ import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/router";
 import { Url } from "url";
 import { Database } from "@/types/supabase";
+import Head from "next/head";
+import { DefaultSeo } from "next-seo";
+import SEO from "../../next-seo.config";
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
@@ -31,6 +34,8 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const indicator = useDisclosure();
   const router = useRouter();
 
+  const pageMeta = (Component as any)?.defaultProps?.meta || {};
+  const pageSEO = { ...SEO, ...pageMeta };
   const getLayout = Component.getLayout ?? ((page) => page);
 
   useEffect(() => {
@@ -55,25 +60,31 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   }, [router]);
 
   return (
-    <SessionContextProvider
-      supabaseClient={supabaseClient}
-      initialSession={pageProps.initialSession}
-    >
-      <ChakraProvider>
-        <Fade in={indicator.isOpen}>
-          <Progress
-            colorScheme={"cyan"}
-            height="2px"
-            flex={1}
-            position="fixed"
-            zIndex={"99"}
-            isIndeterminate
-            w="100%"
-          />
-        </Fade>
-        {getLayout(<Component {...pageProps} />)}
-      </ChakraProvider>
-    </SessionContextProvider>
+    <>
+      <Head>
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+      </Head>
+      <DefaultSeo {...pageSEO} />
+      <SessionContextProvider
+        supabaseClient={supabaseClient}
+        initialSession={pageProps.initialSession}
+      >
+        <ChakraProvider>
+          <Fade in={indicator.isOpen}>
+            <Progress
+              colorScheme={"cyan"}
+              height="2px"
+              flex={1}
+              position="fixed"
+              zIndex={"99"}
+              isIndeterminate
+              w="100%"
+            />
+          </Fade>
+          {getLayout(<Component {...pageProps} />)}
+        </ChakraProvider>
+      </SessionContextProvider>
+    </>
   );
 
   // return (

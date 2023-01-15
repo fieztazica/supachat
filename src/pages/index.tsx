@@ -1,4 +1,4 @@
-import { useSupabase } from "@/lib/supabaseClient";
+import { useProfile } from "@/lib/supabaseClient";
 import { Box, Button, Container, Text, useColorMode } from "@chakra-ui/react";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
@@ -7,13 +7,11 @@ import React from "react";
 
 const Home = () => {
   const { toggleColorMode, colorMode } = useColorMode();
-  const { currentUser, session, supabase } = useSupabase();
-
-  console.log(currentUser)
+  const profile  = useProfile();
 
   return (
     <Container>
-      <Text>{currentUser?.full_name}</Text>
+      <Text>{profile?.full_name}</Text>
       <Text>Chat Thoi Nao</Text>
       <Button onClick={toggleColorMode}>{colorMode as string}</Button>
       <NextLink href={"/chat"}>
@@ -48,3 +46,9 @@ const Home = () => {
 // };
 
 export default Home;
+
+Home.defaultProps = {
+  meta: {
+    title: 'SupaChat | Home',
+  },
+}

@@ -34,9 +34,10 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useSupabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/router";
 import ForgotPwd from "@/components/forgotPwd";
+import { GuestRoute } from "@/lib/auth/ProtectedRoute";
 
 function Login() {
-  const { currentUser, session, supabase } = useSupabase();
+  const { session, supabase } = useSupabase();
   const router = useRouter();
   const pwd = useDisclosure();
   const toast = useToast();
@@ -80,8 +81,8 @@ function Login() {
   }
 
   useEffect(() => {
-    if (currentUser) router.reload();
-  }, [currentUser]);
+    if (session !== null) router.reload();
+  }, [session]);
 
   return (
     <Flex minH="100vh" align={"center"} justify={"center"}>
@@ -184,25 +185,12 @@ function Login() {
 
 export default Login;
 
-export const getServerSideProps: GetServerSideProps = async (
-  ctx: GetServerSidePropsContext
-) => {
-  const supabase = await createServerSupabaseClient(ctx);
-  const { data, error } = await supabase.auth.getSession();
-
-  if (error) {
-    throw new Error(error.message);
+Login.defaultProps = {
+  meta: {
+    title: 'SupaChat | Sign In'
   }
+}
 
-  if (!data.session)
-    return {
-      props: {},
-    };
-
-  return {
-    redirect: {
-      destination: "/chat",
-      permanent: false,
-    },
-  };
-};
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => GuestRoute({ context, redirectTo: "/chat" });

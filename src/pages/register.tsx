@@ -36,9 +36,10 @@ import { useRouter } from "next/router";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import NextLink from "next/link";
 import { useSupabase } from "@/lib/supabaseClient";
+import { GuestRoute } from "@/lib/auth/ProtectedRoute";
 
 function Register() {
-  const { currentUser, session, supabase } = useSupabase();
+  const { session, supabase } = useSupabase();
   const router = useRouter();
   const pwd = useDisclosure();
   const toast = useToast();
@@ -103,8 +104,8 @@ function Register() {
   }
 
   useEffect(() => {
-    if (currentUser) router.reload();
-  }, [currentUser]);
+    if (session !== null) router.reload();
+  }, [session]);
 
   return (
     <Flex minH="100vh" align={"center"} justify={"center"}>
@@ -249,25 +250,12 @@ function Register() {
 
 export default Register;
 
-export const getServerSideProps: GetServerSideProps = async (
-  ctx: GetServerSidePropsContext
-) => {
-  const supabase = await createServerSupabaseClient(ctx);
-  const { data, error } = await supabase.auth.getSession();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!data.session)
-    return {
-      props: {},
-    };
-
-  return {
-    redirect: {
-      destination: "/chat",
-      permanent: false,
-    },
-  };
+Register.defaultProps = {
+  meta: {
+    title: "SupaChat | Sign Up",
+  },
 };
+
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => GuestRoute({ context, redirectTo: "/chat" });
