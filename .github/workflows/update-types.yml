@@ -1,4 +1,4 @@
-- name: Generate Supabase Database types
+  name: Generate Supabase Database types
   # You may pin to the exact commit or the version.
   # uses: lyqht/generate-supabase-db-types-github-action@86b729b04bea32a75433bc942e8c8833f54c226b
   uses: lyqht/generate-supabase-db-types-github-action@v1.0.0
