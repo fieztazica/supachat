@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import { SessionContextProvider, Session } from "@supabase/auth-helpers-react";
 import { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import type { NextPage } from "next";
 import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/router";

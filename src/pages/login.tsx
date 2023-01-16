@@ -30,7 +30,7 @@ import NextLink from "next/link";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 // import { supabase } from "@/lib/supabaseClient";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useSupabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/router";
 import ForgotPwd from "@/components/forgotPwd";
@@ -38,6 +38,8 @@ import { GuestRoute } from "@/lib/auth/ProtectedRoute";
 
 function Login() {
   const { session, supabase } = useSupabase();
+  // const supabase = useSupabaseClient()
+  // const session = useSession()
   const router = useRouter();
   const pwd = useDisclosure();
   const toast = useToast();

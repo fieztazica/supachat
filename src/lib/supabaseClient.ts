@@ -6,15 +6,9 @@ import { createClient, User, Session, PostgrestResponse } from '@supabase/supaba
 import { useEffect, useState } from 'react'
 import { Database } from '@/types/supabase';
 
-export const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string, {
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
-  },
-}
+export const supabaseBeClient = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 export const useProfile = () => {
@@ -24,14 +18,15 @@ export const useProfile = () => {
 
 export const getProfiles = async (userIds: string[]) => {
 
-  return await supabase
+  return await supabaseBeClient
     .from('profiles')
     .select('*')
     .in('id', userIds)
 }
 
 export const getProfile = async (userId: string) => {
-  return await supabase
+  
+  return await supabaseBeClient
     .from('profiles')
     .select('*')
     .eq('id', userId)
@@ -40,7 +35,7 @@ export const getProfile = async (userId: string) => {
 }
 
 export const useSupabase = () => {
-  // const supabase = useSupabaseClient<Database>();
+  const supabase = useSupabaseClient<Database>();
   const user = useUser();
   const session = useSession()
   const [profile, setProfile] = useState<Profile | null | undefined>(null)
