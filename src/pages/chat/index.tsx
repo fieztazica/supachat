@@ -24,6 +24,7 @@ import { useRouter } from "next/router";
 import ProtectedRoute from "@/lib/auth/ProtectedRoute";
 import { useEffect, useState } from "react";
 import OnlineUsers from "@/components/onlineUsers";
+import AppLayout from "@/components/layouts/appLayout";
 
 const Chat = ({ user }: { user: User }) => {
   const { supabase } = useSupabase();
@@ -53,7 +54,7 @@ const Chat = ({ user }: { user: User }) => {
           <Text>{user?.user_metadata.full_name}</Text>
         </CardBody>
       </Card>
-      <OnlineUsers userId={user.id}/>
+      <OnlineUsers userId={user.id} />
     </Container>
   );
 };
@@ -68,4 +69,8 @@ Chat.defaultProps = {
   meta: {
     title: "SupaChat | App",
   },
+};
+
+Chat.getLayout = function getLayout(page: JSX.Element) {
+  return <AppLayout>{page}</AppLayout>;
 };
