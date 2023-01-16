@@ -1,13 +1,20 @@
   name: Generate Supabase Database types
-  # You may pin to the exact commit or the version.
-  # uses: lyqht/generate-supabase-db-types-github-action@86b729b04bea32a75433bc942e8c8833f54c226b
-  uses: lyqht/generate-supabase-db-types-github-action@v1.0.0
-  with:
-    # Reference id of your Supabase project
-    SUPABASE_REF_ID: ${{ secrets.SUPABASE_REF_ID }}
-    # Access token https://app.supabase.com/account/tokens
-    SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-    # Database password
-    DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-    # Path where you want the definitions file to be saved. Any changes will be committed and override existing definition files. Default value is 'src/types/supabase.ts'
-    OUTPUT_PATH: src/types/supabase.ts
+  on:
+    schedule:
+      - cron: '0 0 * * *'
+    workflow_dispatch:
+
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: lyqht/generate-supabase-db-types-github-action@v1.0.0
+        with:
+          # Reference id of your Supabase project
+          SUPABASE_REF_ID: ${{ secrets.SUPABASE_REF_ID }}
+          # Access token https://app.supabase.com/account/tokens
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          # Database password
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          # Path where you want the definitions file to be saved. Any changes will be committed and override existing definition files. Default value is 'src/types/supabase.ts'
+          OUTPUT_PATH: src/types/supabase.ts
