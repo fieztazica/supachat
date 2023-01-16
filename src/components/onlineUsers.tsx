@@ -18,9 +18,9 @@ import { RealtimePresenceState } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
 type Props = {
-  userId: string,
-  channelId?: string
-}
+  userId: string;
+  channelId?: string;
+};
 
 function OnlineUsers({ userId, channelId }: Props) {
   const { supabase, user } = useSupabase();
@@ -31,7 +31,7 @@ function OnlineUsers({ userId, channelId }: Props) {
     async function fetchOnlineUsers() {
       const online = await channel.presenceState();
       // console.log("Online users: ", online);
-      const onlineUserIds = Object.keys(online);
+      const onlineUserIds = Object.keys(online).filter((id) => id !== userId);
       const { data: onlineProfiles } = await getProfiles(onlineUserIds);
       setOnlineUsers(onlineProfiles);
     }
@@ -75,7 +75,7 @@ function OnlineUsers({ userId, channelId }: Props) {
         // console.log(status);
       }
     });
-    
+
     fetchOnlineUsers();
   }, []);
 
