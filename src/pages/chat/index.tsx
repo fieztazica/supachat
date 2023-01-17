@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   CardBody,
+  Center,
   Container,
   Text,
 } from "@chakra-ui/react";
@@ -25,37 +26,16 @@ import ProtectedRoute from "@/lib/auth/ProtectedRoute";
 import { useEffect, useState } from "react";
 import OnlineUsers from "@/components/onlineUsers";
 import AppLayout from "@/components/layouts/appLayout";
+import ChatLayout from "@/components/layouts/chat/chatLayout";
 
 const Chat = ({ user }: { user: User }) => {
   const { supabase } = useSupabase();
   const router = useRouter();
 
   return (
-    <Container>
-      <Button
-        onClick={() => {
-          (async () => {
-            const { error } = await supabase.auth.signOut();
-            if (!error) router.reload();
-          })();
-        }}
-      >
-        Logout
-      </Button>
-      <Card>
-        <CardBody>
-          <Avatar
-            name={user?.user_metadata.full_name}
-            src={user?.user_metadata.avatar_url}
-          >
-            <AvatarBadge boxSize="1em" bg="green.500" />
-          </Avatar>
-          <Text>{user?.id}</Text>
-          <Text>{user?.user_metadata.full_name}</Text>
-        </CardBody>
-      </Card>
-      <OnlineUsers userId={user.id} />
-    </Container>
+    <Center h="$100vh">
+      <Text>Welcome, {user.user_metadata.full_name}!</Text>
+    </Center>
   );
 };
 
@@ -72,5 +52,5 @@ Chat.defaultProps = {
 };
 
 Chat.getLayout = function getLayout(page: JSX.Element) {
-  return <AppLayout>{page}</AppLayout>;
+  return <ChatLayout>{page}</ChatLayout>;
 };

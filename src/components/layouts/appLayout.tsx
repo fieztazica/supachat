@@ -8,19 +8,19 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import Channels from "./channels";
-import SideBar from "./sidebar";
+import SideBar from "./chat/chatSidebar";
 
-function AppLayout({ children }: { children: JSX.Element }) {
+function AppLayout({
+  children,
+  sidebar,
+}: {
+  children: JSX.Element;
+  sidebar: JSX.Element;
+}) {
   return (
-    <Flex h="100vh">
-      <SideBar p="2" />
-      <Channels
-        p="2"
-        borderLeft={"1px"}
-        borderRight={"1px"}
-        borderColor={useColorModeValue("gray.800", "white")}
-      />
-      <Box as={"main"} flex="1" p="2">
+    <Flex h="100vh" w="100vw" maxH="100vh">
+      <Box>{sidebar}</Box>
+      <Box as={"main"} flex="1">
         {children}
       </Box>
     </Flex>

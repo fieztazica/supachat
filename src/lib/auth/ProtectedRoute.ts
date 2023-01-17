@@ -79,7 +79,7 @@ export const GuestRoute = async ({ context, redirectTo = '/', getPropsFunc = () 
         }
     }
 
-    const resolvedProps = getPropsFunc ? await getPropsFunc({ }) : {}
+    const resolvedProps = getPropsFunc ? await getPropsFunc({}) : {}
     // or, alternatively, can send the same values that client-side context populates to check on the client and redirect
     return {
         props: {

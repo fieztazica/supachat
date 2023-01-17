@@ -84,6 +84,7 @@ function Login() {
 
   useEffect(() => {
     if (session !== null) router.reload();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   return (

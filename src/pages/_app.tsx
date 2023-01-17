@@ -56,6 +56,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       router.events.off("routeChangeComplete", handleStop);
       router.events.off("routeChangeError", handleStop);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   return (
