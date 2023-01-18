@@ -1,6 +1,7 @@
 import { GetServerSidePropsContext } from 'next';
-import { User } from '@supabase/supabase-js'
+import { SupabaseClient, User } from '@supabase/supabase-js'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { Database } from '@/types/supabase';
 
 export type ProtectedRouteProps = {
     props: {
@@ -29,7 +30,9 @@ export type ProtectedRouteServerSideProps = ProtectedRouteProps | ProtectedRoute
 export type GuestRouteServerSideProps = GuestRouteProps | ProtectedRouteRedirProps
 
 export type GetPropsFuncProps = {
-    user?: User
+    supabase?: SupabaseClient;
+    context?: GetServerSidePropsContext
+    [key: string]: any
 }
 
 export type GetPropsFunc = (option: GetPropsFuncProps) => void
@@ -41,7 +44,7 @@ export type ProtectedRouteOption = {
 }
 
 export const ProtectedRoute = async ({ context, redirectTo = '/', getPropsFunc = () => { } }: ProtectedRouteOption): Promise<ProtectedRouteServerSideProps> => {
-    const supabase = await createServerSupabaseClient(context);
+    const supabase = await createServerSupabaseClient<Database>(context);
 
     const { data: { user }, error } = await supabase.auth.getUser();
     // We can do a re-direction from the server
@@ -54,7 +57,7 @@ export const ProtectedRoute = async ({ context, redirectTo = '/', getPropsFunc =
         }
     }
 
-    const resolvedProps = getPropsFunc ? await getPropsFunc({ user }) : {}
+    const resolvedProps = getPropsFunc ? await getPropsFunc({ context, user, supabase }) : {}
     // or, alternatively, can send the same values that client-side context populates to check on the client and redirect
     return {
         props: {
@@ -66,7 +69,7 @@ export const ProtectedRoute = async ({ context, redirectTo = '/', getPropsFunc =
 }
 
 export const GuestRoute = async ({ context, redirectTo = '/', getPropsFunc = () => { } }: ProtectedRouteOption): Promise<GuestRouteServerSideProps> => {
-    const supabase = await createServerSupabaseClient(context);
+    const supabase = await createServerSupabaseClient<Database>(context);
 
     const { data: { user }, error } = await supabase.auth.getUser();
     // We can do a re-direction from the server

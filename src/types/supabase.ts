@@ -31,6 +31,93 @@ export interface Database {
   }
   public: {
     Tables: {
+      channels: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          id: number
+          name: string | null
+          owner_id: string | null
+          total_members: number
+          type: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: number
+          name?: string | null
+          owner_id?: string | null
+          total_members?: number
+          type: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: number
+          name?: string | null
+          owner_id?: string | null
+          total_members?: number
+          type?: string
+        }
+      }
+      members: {
+        Row: {
+          channel_id: number
+          created_at: string | null
+          id: number
+          is_owner: boolean
+          nickname: string | null
+          user_id: string
+        }
+        Insert: {
+          channel_id: number
+          created_at?: string | null
+          id?: number
+          is_owner?: boolean
+          nickname?: string | null
+          user_id: string
+        }
+        Update: {
+          channel_id?: number
+          created_at?: string | null
+          id?: number
+          is_owner?: boolean
+          nickname?: string | null
+          user_id?: string
+        }
+      }
+      messages: {
+        Row: {
+          channel_id: number
+          content: string | null
+          created_at: string | null
+          id: string
+          reactions: string[] | null
+          reply_to_message_id: string | null
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          channel_id: number
+          content?: string | null
+          created_at?: string | null
+          id: string
+          reactions?: string[] | null
+          reply_to_message_id?: string | null
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          channel_id?: number
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          reactions?: string[] | null
+          reply_to_message_id?: string | null
+          type?: string | null
+          user_id?: string
+        }
+      }
       profiles: {
         Row: {
           avatar_url: string | null

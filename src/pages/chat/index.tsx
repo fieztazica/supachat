@@ -28,13 +28,11 @@ import OnlineUsers from "@/components/onlineUsers";
 import AppLayout from "@/components/layouts/appLayout";
 import ChatLayout from "@/components/layouts/chat/chatLayout";
 
-const Chat = ({ user }: { user: User }) => {
-  const { supabase } = useSupabase();
-  const router = useRouter();
-
+const Chat = () => {
+  const { profile } = useSupabase();
   return (
     <Center h="$100vh">
-      <Text>Welcome, {user.user_metadata.full_name}!</Text>
+      <Text>Welcome, {profile?.full_name || "Mr. Unknown"}!</Text>
     </Center>
   );
 };

@@ -33,6 +33,7 @@ import NextLink from "next/link";
 import SidebarMenu from "../../sidebarMenu";
 import SideBarButton from "../../sidebarButton";
 import AvatarStatus from "../../avatarStatus";
+import Channels from "../channels";
 
 function ChatSideBar({ ...props }) {
   const {
@@ -55,42 +56,14 @@ function ChatSideBar({ ...props }) {
     <Flex w={isOpen ? "sm" : "full-content"} direction="column" {...props}>
       <Stack flex="1" direction={"column"} overflow="hidden">
         <NextLink href="/chat">
-          <Heading size={["sm", "md"]} hidden={!isOpen}>
-            SupaChat
-          </Heading>
+          <Heading size={["sm", "md"]}>SupaChat</Heading>
         </NextLink>
         <Divider />
-        <InputGroup hidden={!isOpen}>
+        <InputGroup pr={1}>
           <InputLeftElement pointerEvents="none">🔍</InputLeftElement>
           <Input placeholder="Search" />
         </InputGroup>
-        {isOpen && (
-          <Box overflow={"auto"} maxH={"$100vh"} flex="1" rounded="md" pr={1}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(
-              (n, i) => (
-                <NextLink key={i} href={`/chat/${i}`}>
-                  <Button
-                    as={Card}
-                    maxH={"md"}
-                    // w="full"
-                    display="block"
-                    // bg="tomato"
-                    rounded="md"
-                    mt={1}
-                    mb={1}
-                    p={2}
-                    justifyItems="center"
-                    justifyContent={"center"}
-                    direction="row"
-                    variant={"ghost"}
-                  >
-                    <Text>{i}</Text>
-                  </Button>
-                </NextLink>
-              )
-            )}
-          </Box>
-        )}
+        <Channels pr={1} />
       </Stack>
       <Divider mt={2} />
       <Flex
@@ -99,7 +72,7 @@ function ChatSideBar({ ...props }) {
         align="center"
         mt={2}
       >
-        <SidebarMenu isExpanded={isOpen}></SidebarMenu>
+        <SidebarMenu />
       </Flex>
     </Flex>
   );

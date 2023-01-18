@@ -28,7 +28,7 @@ import { useRouter } from "next/router";
 //   <SideBarButton ref={ref} {...props} />
 // ));
 
-function SidebarMenu({ isExpanded }: { isExpanded: boolean }) {
+function SidebarMenu({ isExpanded = true}: { isExpanded?: boolean }) {
   const { profile, supabase } = useSupabase();
   const router = useRouter();
 
@@ -39,8 +39,6 @@ function SidebarMenu({ isExpanded }: { isExpanded: boolean }) {
         variant={"ghost"}
         // leftIcon={!!isExpanded && <AvatarStatus profile={profile!} />}
         // icon={!isExpanded && <AvatarStatus profile={profile!} />}
-        isOpen={!!isExpanded}
-        ariaLabel={"Menu Button"}
         aria-label="Menu Button"
         w="100%"
         size="lg"

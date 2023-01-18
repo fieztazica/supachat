@@ -24,7 +24,7 @@ function SideBarButton({
         ) : (
           <Center>
             <IconButton
-              aria-label={ariaLabel!}
+              aria-label={"Icon Button"}
               variant={"ghost"}
               icon={icon}
               {...props}
