@@ -34,6 +34,7 @@ import SidebarMenu from "../../sidebarMenu";
 import SideBarButton from "../../sidebarButton";
 import AvatarStatus from "../../avatarStatus";
 import Channels from "../channels";
+import OnlineUsers from "@/components/onlineUsers";
 
 function ChatSideBar({ ...props }) {
   const {
@@ -58,6 +59,8 @@ function ChatSideBar({ ...props }) {
         <NextLink href="/chat">
           <Heading size={["sm", "md"]}>SupaChat</Heading>
         </NextLink>
+        <Divider />
+        <OnlineUsers />
         <Divider />
         <InputGroup pr={1}>
           <InputLeftElement pointerEvents="none">🔍</InputLeftElement>

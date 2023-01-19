@@ -1,3 +1,4 @@
+import Chat from "@/components/chat";
 import ChatLayout from "@/components/layouts/chat/chatLayout";
 import ProtectedRoute from "@/lib/auth/ProtectedRoute";
 import { Channel } from "@/types";
@@ -15,9 +16,7 @@ function Channel({ channel, ...props }: { channel: Channel }) {
       <Head>
         <title>SupaChat | {channel?.id}</title>
       </Head>
-      <Box p={10}>
-        <Text>You select channel {channel?.id}</Text>
-      </Box>
+      <Chat channel={channel} />
     </>
   );
 }
@@ -41,7 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (
   const supabase = await createServerSupabaseClient<Database>(context);
 
   const sUser = await supabase.auth.getUser();
-  
+
   if (!sUser.data.user) {
     return {
       redirect: {
