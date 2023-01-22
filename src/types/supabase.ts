@@ -36,27 +36,27 @@ export interface Database {
           avatar_url: string | null
           created_at: string | null
           id: number
+          is_private: boolean
           name: string | null
-          owner_id: string | null
-          total_members: number
+          owner_id: string
           type: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
           id?: number
+          is_private?: boolean
           name?: string | null
-          owner_id?: string | null
-          total_members?: number
-          type: string
+          owner_id: string
+          type?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string | null
           id?: number
+          is_private?: boolean
           name?: string | null
-          owner_id?: string | null
-          total_members?: number
+          owner_id?: string
           type?: string
         }
       }
@@ -64,24 +64,27 @@ export interface Database {
         Row: {
           channel_id: number
           created_at: string | null
-          id: number
-          is_owner: boolean
+          id: string
+          is_joined: boolean
+          joined_at: string
           nickname: string | null
           user_id: string
         }
         Insert: {
           channel_id: number
           created_at?: string | null
-          id?: number
-          is_owner?: boolean
+          id?: string
+          is_joined?: boolean
+          joined_at?: string
           nickname?: string | null
           user_id: string
         }
         Update: {
           channel_id?: number
           created_at?: string | null
-          id?: number
-          is_owner?: boolean
+          id?: string
+          is_joined?: boolean
+          joined_at?: string
           nickname?: string | null
           user_id?: string
         }
@@ -89,32 +92,26 @@ export interface Database {
       messages: {
         Row: {
           channel_id: number
-          content: string | null
+          content: string
           created_at: string | null
           id: string
-          reactions: string[] | null
-          reply_to_message_id: string | null
-          type: string | null
+          member: string | null
           user_id: string
         }
         Insert: {
           channel_id: number
-          content?: string | null
+          content: string
           created_at?: string | null
-          id: string
-          reactions?: string[] | null
-          reply_to_message_id?: string | null
-          type?: string | null
+          id?: string
+          member?: string | null
           user_id: string
         }
         Update: {
           channel_id?: number
-          content?: string | null
+          content?: string
           created_at?: string | null
           id?: string
-          reactions?: string[] | null
-          reply_to_message_id?: string | null
-          type?: string | null
+          member?: string | null
           user_id?: string
         }
       }
@@ -125,7 +122,6 @@ export interface Database {
           id: string
           updated_at: string | null
           username: string | null
-          website: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -133,7 +129,6 @@ export interface Database {
           id: string
           updated_at?: string | null
           username?: string | null
-          website?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -141,7 +136,6 @@ export interface Database {
           id?: string
           updated_at?: string | null
           username?: string | null
-          website?: string | null
         }
       }
     }

@@ -18,38 +18,62 @@ import { RealtimePresenceState } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
 type Props = {
-  userId?: string;
-  channelId?: string;
+  channelId: number;
 };
 
-function OnlineUsers({ userId, channelId }: Props) {
-  const { supabase, user } = useSupabase();
-  const [onlineUsers, setOnlineUsers] = useState<Profile[] | null>();
+function OnlineUsers({ channelId }: Props) {
+  const { supabase } = useSupabase();
+  const [onlineUsers, setOnlineUsers] = useState<Profile[]>([]);
+  const [channelUserIds, setChannelUserIds] = useState<string[]>([]);
   const toast = useToast();
 
+  // console.log(channelUserIds);
+
   useEffect(() => {
-    async function fetchOnlineUsers() {
-      const online = await channel.presenceState();
-      console.log("Online users: ", online);
-      const onlineUserIds = Object.keys(online).filter((id) => id !== user?.id);
-      const { data: onlineProfiles } = await getProfiles(onlineUserIds);
-      setOnlineUsers(onlineProfiles);
-    }
+    (async () => {
+      const channel = supabase.channel(`online`);
 
-    const channel = supabase.channel("online");
+      channel.on("presence", { event: "sync" }, () => fetchOnlineUsers());
 
-    channel.on("presence", { event: "sync" }, () => fetchOnlineUsers());
+      async function fetchOnlineUsers() {
+        const online = await channel.presenceState();
 
-    fetchOnlineUsers();
+        const onlineUserIds = Object.keys(online).filter(
+          (id) =>
+            // channelUserIds.includes(id)
+            id
+        );
+
+        const { data: onlineProfiles } = await getProfiles(onlineUserIds);
+        setOnlineUsers(onlineProfiles || []);
+      }
+
+      async function fetchChannelUsers() {
+        const { data } = await supabase
+          .from("members")
+          .select("user_id")
+          .eq("channel_id", channelId);
+
+        if (!!data) {
+          const userIds = await data.map((u) => u.user_id);
+          setChannelUserIds(userIds);
+        }
+      }
+
+      fetchChannelUsers();
+      fetchOnlineUsers();
+    })();
   }, []);
 
   return (
     <Box mt={4}>
-      <Heading size="xs">Online</Heading>
+      <Heading size="xs">
+        {!onlineUsers.length ? "Offline" : `Online - ${onlineUsers.length}`}
+      </Heading>
       <Wrap p={2}>
-        {onlineUsers?.map((onlineUser, index) => {
+        {onlineUsers.map((onlineUser, index) => {
           return (
-            <WrapItem key={onlineUser.id}>
+            <WrapItem key={`Online - ${onlineUser.id}`}>
               <Tooltip label={onlineUser.full_name || undefined}>
                 <Avatar
                   name={onlineUser.full_name || undefined}

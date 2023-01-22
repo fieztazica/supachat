@@ -20,6 +20,7 @@ function AppLayout({
   sidebar: JSX.Element;
 }) {
   const { supabase, user } = useSupabase();
+  
   useEffect(() => {
     if (!user) return;
 
@@ -46,6 +47,7 @@ function AppLayout({
       onlineChannel.untrack();
     };
   }, [user, supabase]);
+
   return (
     <Flex h="100vh" w="100vw" maxH="100vh">
       <Box>{sidebar}</Box>

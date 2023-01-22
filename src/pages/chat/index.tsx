@@ -24,7 +24,6 @@ import { useSupabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/router";
 import ProtectedRoute from "@/lib/auth/ProtectedRoute";
 import { useEffect, useState } from "react";
-import OnlineUsers from "@/components/onlineUsers";
 import AppLayout from "@/components/layouts/appLayout";
 import ChatLayout from "@/components/layouts/chat/chatLayout";
 
