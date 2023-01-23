@@ -25,11 +25,20 @@ function ChatInput({
     <Formik
       initialValues={{ message: "" }}
       onSubmit={async (values, actions) => {
+        if (
+          !values.message ||
+          !values.message.length ||
+          !values.message.trim().length
+        )
+          return actions.setErrors({ message: `Message cant be empty` });
+
+        const messageContent = values.message as string;
+
         const res = await supabase.from("messages").insert([
           {
             channel_id: channelId,
             user_id: userId,
-            content: values.message,
+            content: messageContent,
           },
         ]);
         if (res.error) {
@@ -46,7 +55,7 @@ function ChatInput({
             {({ field, form }: FieldProps<string, { message: string }>) => (
               <FormControl isInvalid={form.errors.message ? true : false}>
                 <InputGroup>
-                  <Input placeholder="Say s0m3th1ng" {...field} />
+                  <Input isRequired placeholder="Say s0m3th1ng" {...field} />
                   <InputRightElement>
                     <IconButton
                       icon={<MdSend />}

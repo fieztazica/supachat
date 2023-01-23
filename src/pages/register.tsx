@@ -73,8 +73,11 @@ function Register() {
 
       if (data.user) {
         toast({
-          title: `Successfully signed you up! A confirmation mail should be sent soon!`,
+          title: `Successfully signed you up.`,
+          description: `A confirmation mail should be sent soon!`,
           status: "success",
+          duration: 5000,
+          isClosable: true,
         });
       }
     },
@@ -105,7 +108,7 @@ function Register() {
 
   useEffect(() => {
     if (session !== null) router.reload();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   return (

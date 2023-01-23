@@ -11,9 +11,8 @@ import {
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { MdDarkMode, MdLightMode } from "react-icons/md";
 import NextLink from "next/link";
-import { IoMdPerson, IoMdSettings, IoMdLogOut } from "react-icons/io";
+import { IoMdPerson, IoMdApps, IoMdLogOut } from "react-icons/io";
 import { BsFillChatFill } from "react-icons/bs";
 import { useSupabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/router";
@@ -37,29 +36,27 @@ function SettingsSidebar({ ...props }) {
           bg={useColorModeValue("gray.100", "whiteAlpha.200")}
         />
         <Divider />
+        <NextLink href="/settings">
+          <Button justifyContent={"left"} leftIcon={<IoMdApps />} w="full">
+            App Settings
+          </Button>
+        </NextLink>
         <NextLink href="/settings/profile">
           <Button justifyContent={"left"} leftIcon={<IoMdPerson />} w="full">
             Profile
           </Button>
         </NextLink>
-        <Button
-          onClick={toggleColorMode}
-          leftIcon={colorMode === "light" ? <MdDarkMode /> : <MdLightMode />}
-          w="full"
-          justifyContent={"left"}
-        >
-          Switch to {colorMode === "light" ? "dark" : "light"} theme
-        </Button>
         <Divider />
-        <NextLink href="/chat">
-          <Button
-            justifyContent={"left"}
-            leftIcon={<BsFillChatFill />}
-            w="full"
-          >
-            Back to chat
-          </Button>
-        </NextLink>
+        <Button
+          justifyContent={"left"}
+          leftIcon={<BsFillChatFill />}
+          w="full"
+          onClick={() => {
+            router.back();
+          }}
+        >
+          Back to chat
+        </Button>
         <Button
           colorScheme={"red"}
           justifyContent={"left"}

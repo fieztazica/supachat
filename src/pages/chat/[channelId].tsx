@@ -1,4 +1,3 @@
-import Chat from "@/components/chat";
 import ChatInput from "@/components/chatInput";
 import ChatLayout from "@/components/layouts/chat/chatLayout";
 import Messages from "@/components/messages";
@@ -10,21 +9,31 @@ import { Database } from "@/types/supabase";
 import {
   Avatar,
   Box,
+  Button,
   Card,
   CardHeader,
+  Divider,
   Flex,
+  Heading,
   IconButton,
+  Stack,
+  Tag,
   Text,
   useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { MdInfoOutline } from "react-icons/md";
+import { CgCornerUpLeft } from "react-icons/cg";
 
 function Channel({ channel, ...props }: { channel: Channel }) {
   const RightBarState = useDisclosure({ defaultIsOpen: true });
+  const { user } = useSupabase();
+  if (!user) return null;
+
   return (
     <>
       <Head>
@@ -40,9 +49,9 @@ function Channel({ channel, ...props }: { channel: Channel }) {
             justifyContent={"space-between"}
             borderBottom={"1px"}
           >
-            <Text>
+            <Heading size="md">
               {!channel.name ? `Channel ${channel.id}` : channel.name}
-            </Text>
+            </Heading>
             <IconButton
               variant={"ghost"}
               fontSize="2xl"
@@ -51,13 +60,45 @@ function Channel({ channel, ...props }: { channel: Channel }) {
               onClick={RightBarState.onToggle}
             />
           </Flex>
-          <Chat channel={channel} />
+          <Messages channelId={channel.id} />
+          <Box p={2}>
+            <ChatInput userId={user.id} channelId={channel.id} />
+          </Box>
         </Flex>
         {RightBarState.isOpen && (
-          <Box p={2} borderLeft={"1px"} w="xs" maxW="xs" overflow={"auto"}>
-            <Avatar />
-            {/* <OnlineUsers channelId={channel.id}/> */}
-          </Box>
+          <Flex
+            direction={"column"}
+            borderLeft={"1px"}
+            minW="xs"
+            maxW="xs"
+            maxH={"$100vh"}
+          >
+            <Box w="$100vw" overflow={"auto"} p={4}>
+              <VStack minW="$100vw">
+                <Avatar />
+                <Text>{channel.name || channel.id}</Text>
+                <Tag colorScheme={channel.is_private ? "purple" : "cyan"}>
+                  {channel.is_private ? `Private` : `Public`}
+                </Tag>
+                <Divider />
+                <Button w="100%">Change channel avatar</Button>
+                <Button w="100%">Change user&#39;s nickname</Button>
+                <Button w="100%">
+                  {channel.is_private
+                    ? "Open channel to public"
+                    : "Make channel private"}
+                </Button>
+                <Divider />
+                <Button
+                  leftIcon={<CgCornerUpLeft />}
+                  colorScheme={"red"}
+                  w="100%"
+                >
+                  Leave channel
+                </Button>
+              </VStack>
+            </Box>
+          </Flex>
         )}
       </Flex>
     </>
@@ -93,12 +134,22 @@ export const getServerSideProps: GetServerSideProps = async (
     };
   }
 
-  const { data: channel } = await supabase
+  const channelId = context.params?.["channelId"];
+
+  const { data, error } = await supabase
     .from("channels")
-    .select()
-    .eq("id", context.params?.["channelId"])
+    .select(`*`)
+    .eq("id", channelId)
     .limit(1)
     .single();
+
+  if (error || !data) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const channel = data as Channel;
 
   if (!channel) {
     return {

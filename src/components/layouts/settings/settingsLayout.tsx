@@ -5,7 +5,7 @@ import SettingsSidebar from "./settingsSidebar";
 function SettingsLayout({ children }: { children: JSX.Element }) {
   return (
     <AppLayout
-      sidebar={
+      leftSidebar={
         <SettingsSidebar
           borderRight={"1px"}
           borderColor={useColorModeValue("gray.800", "white")}

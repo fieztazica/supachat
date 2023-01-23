@@ -33,7 +33,7 @@ function ForgotPwd({ children }: { children: JSX.Element }) {
       const { data, error } = await supabase.auth.resetPasswordForEmail(
         `${values.email}`,
         {
-          redirectTo: `http://localhost:3000/update-password`,
+          redirectTo: `${window.location.origin}/reset`,
         }
       );
 
@@ -44,10 +44,10 @@ function ForgotPwd({ children }: { children: JSX.Element }) {
 
       if (data && !error) {
         toast({
-          title: `An mail has been sent! Check your mailbox for next step!`,
+          title: `An mail has been sent!`,
+          description: ` Check your mailbox for next step!`,
           status: "success",
         });
-        console.log(data)
       }
     },
   });
@@ -71,11 +71,16 @@ function ForgotPwd({ children }: { children: JSX.Element }) {
                   type="email"
                   onChange={formik.handleChange}
                   value={formik.values.email}
+                  autoFocus
                 />
               </FormControl>
             </ModalBody>
             <ModalFooter>
-              <Button type="submit" isLoading={formik.isSubmitting}>
+              <Button
+                type="submit"
+                colorScheme={"cyan"}
+                isLoading={formik.isSubmitting}
+              >
                 Send
               </Button>
             </ModalFooter>

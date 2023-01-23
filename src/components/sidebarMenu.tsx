@@ -28,9 +28,11 @@ import { useRouter } from "next/router";
 //   <SideBarButton ref={ref} {...props} />
 // ));
 
-function SidebarMenu({ isExpanded = true}: { isExpanded?: boolean }) {
+function SidebarMenu({ isExpanded = true }: { isExpanded?: boolean }) {
   const { profile, supabase } = useSupabase();
   const router = useRouter();
+
+  if (!profile) return null;
 
   return (
     <Menu>
@@ -47,11 +49,7 @@ function SidebarMenu({ isExpanded = true}: { isExpanded?: boolean }) {
       >
         <Stack direction={"row"} align="center">
           <AvatarStatus profile={profile!} />
-          <Stack
-            direction={"column"}
-            spacing={"0"}
-            overflow={"hidden"}
-          >
+          <Stack direction={"column"} spacing={"0"} overflow={"hidden"}>
             <Text align={"left"}>{profile?.full_name}</Text>
             <Text
               align={"left"}

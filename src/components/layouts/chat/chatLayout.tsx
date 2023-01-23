@@ -5,7 +5,7 @@ import ChatSideBar from "./chatSidebar";
 function ChatLayout({ children }: { children: JSX.Element }) {
   return (
     <AppLayout
-      sidebar={
+      leftSidebar={
         <ChatSideBar
           h="$100vh"
           p="2"

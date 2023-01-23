@@ -50,6 +50,8 @@ function ChatSideBar({ ...props }) {
   const { toggleColorMode, colorMode } = useColorMode();
   // const searchRef = useRef();
 
+  if (!profile) return null;
+
   function handleSearchIconClick() {
     onOpen();
   }

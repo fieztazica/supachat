@@ -38,8 +38,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   useEffect(() => {
-    const handleStart = (url: Url) => {
-      console.log(`Loading: ${url}`);
+    const handleStart = () => {
       indicator.onOpen();
     };
 

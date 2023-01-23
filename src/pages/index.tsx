@@ -1,4 +1,4 @@
-import { useProfile } from "@/lib/supabaseClient";
+import { useSupabase } from "@/lib/supabaseClient";
 import {
   Box,
   Button,
@@ -12,7 +12,6 @@ import {
   Divider,
   Switch,
   Flex,
-  useToast,
 } from "@chakra-ui/react";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
@@ -21,17 +20,26 @@ import React, { useEffect } from "react";
 
 const Home = () => {
   const { toggleColorMode, colorMode } = useColorMode();
-  const toast = useToast();
-  const profile = useProfile();
+  const { profile, supabase } = useSupabase();
 
   useEffect(() => {
-    if (!!profile) {
-      toast({
-        status: "info",
-        title: `We found you, ${profile.full_name}!`,
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log(event);
+      if (event == "PASSWORD_RECOVERY") {
+        const newPassword =
+          prompt("What would you like your new password to be?") || undefined;
+        const { data, error } = await supabase.auth.updateUser({
+          password: newPassword,
+        });
+
+        if (data) alert("Password updated successfully!");
+        if (error) alert("There was an error updating your password.");
+      }
+    });
+
+    console.log(localStorage.getItem("chakra-ui-color-mode"))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -44,7 +52,7 @@ const Home = () => {
         </Center>
         <NextLink href={"/chat"}>
           <Button colorScheme={"cyan"} w="full">
-            Hang in
+            Hang in{!!profile && `, ${profile?.full_name}!`}
           </Button>
         </NextLink>
         <Divider />
