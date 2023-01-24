@@ -105,14 +105,7 @@ function Messages({ channelId }: { channelId: number }) {
           .on(
             "postgres_changes",
             { event: "UPDATE", schema: "public", table: "profiles" },
-            (payload) => {
-              getChannelUsers();
-            }
-          )
-          .on(
-            "postgres_changes",
-            { event: "UPDATE", schema: "public", table: "profiles" },
-            (payload) => {
+            () => {
               getChannelUsers();
             }
           )
@@ -124,7 +117,9 @@ function Messages({ channelId }: { channelId: number }) {
               table: "members",
               filter: `channel_id=eq.${channelId}`,
             },
-            () => {}
+            () => {
+              getChannelUsers();
+            }
           )
           .subscribe();
       };
@@ -281,7 +276,7 @@ function Messages({ channelId }: { channelId: number }) {
             );
           })
         ) : (
-          <Text>This is the beginning of the conversation.</Text>
+          <Center h="100%">No message</Center>
         )}
         <Box ref={scrollDummyRef} />
       </Box>

@@ -2,9 +2,10 @@ import { Channel, Profile } from './../types/index';
 import { useRouter } from 'next/router';
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
-import { createClient, User, Session, PostgrestResponse } from '@supabase/supabase-js'
+import { createClient, User, Session, PostgrestResponse, RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 import { Database } from '@/types/supabase';
+import { useForceUpdate } from '@chakra-ui/react';
 
 export const supabaseBeClient = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -51,7 +52,6 @@ export const useSupabase = () => {
   const session = useSession()
   const [profile, setProfile] = useState<Profile | null | undefined>(null)
 
-
   useEffect(() => {
     (async () => {
       if (!session?.user.id) return;
@@ -74,8 +74,8 @@ export const useSupabase = () => {
                 table: "profiles",
                 filter: `id=eq.${userProfile.id}`
               },
-              (payload: any) => {
-                setProfile(payload.new)
+              (payload: RealtimePostgresChangesPayload<Profile>) => {
+                setProfile(payload.new as Profile)
               }
             )
             .subscribe()

@@ -76,13 +76,14 @@ function Channel({ channel, ...props }: { channel: Channel }) {
             <Box w="$100vw" overflow={"auto"} p={4}>
               <VStack minW="$100vw">
                 <Avatar />
-                <Text>{channel.name || channel.id}</Text>
+                <Text>{channel.name ?? channel.id}</Text>
                 <Tag colorScheme={channel.is_private ? "purple" : "cyan"}>
                   {channel.is_private ? `Private` : `Public`}
                 </Tag>
                 <Divider />
                 <Button w="100%">Change channel avatar</Button>
                 <Button w="100%">Change user&#39;s nickname</Button>
+                <Button w="100%">Add member</Button>
                 <Button w="100%">
                   {channel.is_private
                     ? "Open channel to public"
@@ -157,31 +158,19 @@ export const getServerSideProps: GetServerSideProps = async (
     };
   }
 
+  const { data: checkJoinData } = await supabase
+    .from("members")
+    .select("*")
+    .eq("channel_id", channel.id)
+    .eq("user_id", sUser.data.user.id)
+    .eq("is_joined", true);
+
+  if (!checkJoinData || !checkJoinData.length)
+    return {
+      notFound: true,
+    };
+
   return {
     props: { channel },
   };
 };
-
-/**
- * ProtectedRoute({
-    context,
-    redirectTo: "/login",
-    getPropsFunc: async ({ context, user, supabase }) => {
-      if (context && supabase) {
-        // const supabase = await createServerSupabaseClient<Database>(context);
-        const { params } = context;
-        const { data, error } = await supabase
-          .from("channels")
-          .select()
-          .eq("id", params?.["channelId"])
-          .limit(1)
-          .single();
-
-        if (error) return {};
-        if (data) {
-          return { channel: data };
-        } else throw new Error("No Data");
-      } else return {};
-    },
-  });
- */

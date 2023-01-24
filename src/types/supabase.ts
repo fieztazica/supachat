@@ -40,6 +40,7 @@ export interface Database {
           name: string | null
           owner_id: string
           type: string
+          vanity_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -49,6 +50,7 @@ export interface Database {
           name?: string | null
           owner_id: string
           type?: string
+          vanity_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -58,6 +60,30 @@ export interface Database {
           name?: string | null
           owner_id?: string
           type?: string
+          vanity_url?: string | null
+        }
+      }
+      invites: {
+        Row: {
+          channel_id: number | null
+          clicks: number
+          created_at: string | null
+          expired_at: string | null
+          id: string
+        }
+        Insert: {
+          channel_id?: number | null
+          clicks?: number
+          created_at?: string | null
+          expired_at?: string | null
+          id?: string
+        }
+        Update: {
+          channel_id?: number | null
+          clicks?: number
+          created_at?: string | null
+          expired_at?: string | null
+          id?: string
         }
       }
       members: {
@@ -66,7 +92,7 @@ export interface Database {
           created_at: string | null
           id: string
           is_joined: boolean
-          joined_at: string
+          joined_at: string | null
           nickname: string | null
           user_id: string
         }
@@ -75,7 +101,7 @@ export interface Database {
           created_at?: string | null
           id?: string
           is_joined?: boolean
-          joined_at?: string
+          joined_at?: string | null
           nickname?: string | null
           user_id: string
         }
@@ -84,7 +110,7 @@ export interface Database {
           created_at?: string | null
           id?: string
           is_joined?: boolean
-          joined_at?: string
+          joined_at?: string | null
           nickname?: string | null
           user_id?: string
         }

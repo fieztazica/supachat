@@ -36,6 +36,7 @@ import AvatarStatus from "../../avatarStatus";
 import Channels from "../channels";
 import OnlineUsers from "@/components/onlineUsers";
 import CreateChannelButton from "@/components/createChannelButton";
+import NotiPopover from "@/components/notiPopover";
 
 function ChatSideBar({ ...props }) {
   const {
@@ -59,9 +60,18 @@ function ChatSideBar({ ...props }) {
   return (
     <Flex w={isOpen ? "sm" : "full-content"} direction="column" {...props}>
       <Stack flex="1" direction={"column"} overflow="hidden">
-        <NextLink href="/chat">
-          <Heading size={["xs", "md"]}>SupaChat</Heading>
-        </NextLink>
+        <Flex align={"center"} justifyContent="space-between">
+          <NextLink href="/chat">
+            <Heading
+              _hover={{ opacity: "80%" }}
+              rounded="md"
+              size={["xs", "md"]}
+            >
+              SupaChat
+            </Heading>
+          </NextLink>
+          <NotiPopover />
+        </Flex>
         <Divider />
         <InputGroup pr={1}>
           <InputLeftElement pointerEvents="none">🔍</InputLeftElement>

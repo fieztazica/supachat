@@ -33,7 +33,7 @@ function Invite({ channel }: { channel: Channel }) {
         />
         <HStack spacing={1}>
           <Text>You are about to join</Text>
-          <Text fontWeight="bold">{channel.name || channel.id}</Text>
+          <Text fontWeight="bold">{channel.name ?? channel.id}</Text>
         </HStack>
         <Divider />
         <Button colorScheme={"cyan"} w="100%">

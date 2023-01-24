@@ -33,7 +33,7 @@ const Chat = () => {
 
   return (
     <Center h="$100vh">
-      <Text>Welcome, {profile.full_name || "Mr. Unknown"}!</Text>
+      <Text>Welcome, {profile.full_name}!</Text>
     </Center>
   );
 };

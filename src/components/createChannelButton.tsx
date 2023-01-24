@@ -92,7 +92,9 @@ function CreateChannelButton() {
                 .insert([
                   {
                     owner_id: user.id,
-                    name: values.name,
+                    name: !!values.name
+                      ? (values.name as unknown as string).trim()
+                      : null,
                     avatar_url: values.avatar_url,
                     is_private: !values.is_public,
                   },
@@ -109,6 +111,8 @@ function CreateChannelButton() {
                   {
                     channel_id: res.data.id,
                     user_id: user.id,
+                    is_joined: true,
+                    joined_at: `${new Date().toISOString()}`,
                   },
                 ]);
 

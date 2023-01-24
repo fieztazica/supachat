@@ -20,6 +20,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/lib/hooks/useFocus.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/lib/hooks/useFocus.ts"],
   "exclude": ["node_modules"]
 }
