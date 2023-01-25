@@ -92,7 +92,7 @@ function Invite({ channel }: { channel: Channel }) {
 
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={window.location.origin} />
+        <meta property="og:url" content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`} />
         <meta property="og:title" content={title} />
         <meta
           property="og:description"
@@ -102,7 +102,7 @@ function Invite({ channel }: { channel: Channel }) {
 
         {/* Twitter  */}
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content={window.location.origin} />
+        <meta property="twitter:url" content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`} />
         <meta property="twitter:title" content={title} />
         <meta
           property="twitter:description"
