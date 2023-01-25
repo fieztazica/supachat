@@ -26,14 +26,12 @@ import { AiOutlineReload } from "react-icons/ai";
 import { useState, useEffect } from "react";
 import { useSupabase } from "@/lib/supabaseClient";
 import { Channel, Member } from "@/types";
-import moment from "moment";
 import { useRouter } from "next/router";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { isEmpty } from "lodash";
 
 function NotiPopover() {
   const [pending, setPending] = useState<Channel[]>([]);
-  const [pendingIds, setPendingIds] = useState<number[]>([]);
   const { supabase, user } = useSupabase();
   const toast = useToast();
   const router = useRouter();
@@ -56,9 +54,6 @@ function NotiPopover() {
             status: "error",
             description: `${error.message}`,
           });
-        else {
-          setPendingIds((old) => old.filter((id) => id !== channelId));
-        }
       }
     })();
   };
@@ -71,7 +66,8 @@ function NotiPopover() {
             .from("members")
             .select(`channel:channels(*)`)
             .eq("user_id", user.id)
-            .eq("is_joined", false);
+            .eq("is_joined", false)
+            .eq("is_pending", true);
 
           if (!!pendingChannelsData) {
             const pendingChannels = Array.isArray(pendingChannelsData)
@@ -99,10 +95,10 @@ function NotiPopover() {
               },
               (payload: RealtimePostgresChangesPayload<Member>) => {
                 (async () => {
-                //   console.log(payload);
-                
+                  //   console.log(payload);
+
                   setPending(await getPendingChannels());
-                  
+
                   //   if (!!payload.eventType) {
                   //     const newPayload = payload.new as Member;
                   //     const oldPayload = payload.old as Member;
@@ -137,7 +133,6 @@ function NotiPopover() {
 
         const pendingChannels = await getPendingChannels();
         setPending(pendingChannels);
-        setPendingIds(pendingChannels.map((c) => c.id));
         fetchPendingEvent();
       }
     })();
@@ -160,7 +155,9 @@ function NotiPopover() {
         <PopoverBody>
           <Box overflow={"auto"}>
             <Stack>
-              <Text>Pending invitations</Text>
+              <Text>
+                Pending{` ${!pending.length ? "" : pending.length}`} invitations
+              </Text>
               <Divider />
               {pending.map((c) => (
                 <Flex
@@ -168,19 +165,17 @@ function NotiPopover() {
                   align="center"
                   justifyContent={"space-between"}
                 >
-                  <Tooltip label={moment(c.created_at).calendar()}>
-                    <HStack>
-                      <Tag
-                        size="sm"
-                        colorScheme={c.is_private ? "purple" : "cyan"}
-                      >
-                        {c.is_private ? "Private" : "Public"}
-                      </Tag>
-                      <Text fontWeight={"semibold"}>
-                        {c.name ?? c.vanity_url ?? c.id}
-                      </Text>
-                    </HStack>
-                  </Tooltip>
+                  <HStack>
+                    <Tag
+                      size="sm"
+                      colorScheme={c.is_private ? "purple" : "cyan"}
+                    >
+                      {c.is_private ? "Private" : "Public"}
+                    </Tag>
+                    <Text fontWeight={"semibold"}>
+                      {c.name ?? c.vanity_url ?? c.id}
+                    </Text>
+                  </HStack>
                   <Button
                     colorScheme={"cyan"}
                     size="xs"

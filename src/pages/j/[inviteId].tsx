@@ -11,16 +11,76 @@ import {
   HStack,
   Stack,
   Text,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { GrGroup } from "react-icons/gr";
 
 function Invite({ channel }: { channel: Channel }) {
-  const { supabase, user } = useSupabase();
-  const handleJoin = () => {};
+  const { supabase, user, channels } = useSupabase();
+
+  const router = useRouter();
+  const toast = useToast();
+
+  const handleJoin = () => {
+    (async () => {
+      if (!user || !supabase) return router.push("/chat");
+      if (!!channels.includes(channel))
+        return router.push(`/chat/${channel.id}`);
+
+      const { data: isExist, error: existError } = await supabase
+        .from("members")
+        .select()
+        .eq("channel_id", channel.id)
+        .eq("user_id", user.id)
+        .limit(1)
+        .single();
+
+      if (existError || !isExist) {
+        const { error: insertError } = await supabase.from("members").insert([
+          {
+            channel_id: channel.id,
+            user_id: user.id,
+            is_joined: channel.is_private ? false : true,
+            joined_at: channel.is_private ? null : new Date().toISOString(),
+          },
+        ]);
+
+        if (insertError) {
+          console.error(insertError);
+          toast({
+            title: `${insertError.message}`,
+            status: "error",
+            description: `${insertError.details}`,
+          });
+        } else {
+          if (channel.is_private) {
+            toast({
+              title: `Asked!`,
+              status: "success",
+            });
+          } else {
+            router.push(`/chat/${channel.id}`);
+          }
+        }
+      }
+
+      if (isExist) {
+        if (isExist.is_joined) {
+          router.push(`/chat/${channel.id}`);
+        } else {
+          toast({
+            title: `You have already asked!`,
+            status: "error",
+          });
+        }
+      }
+    })();
+  };
 
   return (
     <Center h="100vh">
@@ -36,7 +96,7 @@ function Invite({ channel }: { channel: Channel }) {
           <Text fontWeight="bold">{channel.name ?? channel.id}</Text>
         </HStack>
         <Divider />
-        <Button colorScheme={"cyan"} w="100%">
+        <Button colorScheme={"cyan"} w="100%" onClick={handleJoin}>
           {channel.is_private ? "Ask to join" : "Join"}
         </Button>
       </VStack>
@@ -51,54 +111,29 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   const supabase = await createServerSupabaseClient<Database>(context);
 
-  const sUser = await supabase.auth.getUser();
+  // const sUser = await supabase.auth.getUser();
 
-  if (!sUser.data.user) {
-    return {
-      redirect: {
-        destination: "/chat",
-        permanent: false,
-      },
-    };
-  }
+  // if (!sUser.data.user) {
+  //   return {
+  //     redirect: {
+  //       destination: "/chat",
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   const inviteId = context.params?.["inviteId"] as string;
 
-  const { data, error } = await supabase
+  const { data: channel, error } = await supabase
     .from("channels")
     .select()
     .eq(`vanity_url`, inviteId)
     .limit(1)
     .single();
 
-  if (error || !data) {
+  if (error || !channel) {
     return {
       notFound: true,
-    };
-  }
-
-  const channel = data as Channel;
-
-  if (!channel) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const membersData = await supabase
-    .from("members")
-    .select()
-    .eq("channel_id", channel.id)
-    .eq("user_id", sUser.data.user.id)
-    .limit(1)
-    .single();
-
-  if (membersData.data) {
-    return {
-      redirect: {
-        destination: `/chat/${channel.id}`,
-        permanent: false,
-      },
     };
   }
 

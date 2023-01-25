@@ -92,6 +92,7 @@ export interface Database {
           created_at: string | null
           id: string
           is_joined: boolean
+          is_pending: boolean
           joined_at: string | null
           nickname: string | null
           user_id: string
@@ -101,6 +102,7 @@ export interface Database {
           created_at?: string | null
           id?: string
           is_joined?: boolean
+          is_pending?: boolean
           joined_at?: string | null
           nickname?: string | null
           user_id: string
@@ -110,6 +112,7 @@ export interface Database {
           created_at?: string | null
           id?: string
           is_joined?: boolean
+          is_pending?: boolean
           joined_at?: string | null
           nickname?: string | null
           user_id?: string

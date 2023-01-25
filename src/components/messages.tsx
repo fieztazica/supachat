@@ -1,5 +1,5 @@
 import { useSupabase } from "@/lib/supabaseClient";
-import { Channel, Message, Profile } from "@/types";
+import { Channel, Member, Message, Profile } from "@/types";
 import {
   Avatar,
   Box,
@@ -25,6 +25,8 @@ import { isArray } from "@chakra-ui/utils";
 import moment from "moment";
 import { useRef, useState, useEffect } from "react";
 import Markdown from "markdown-to-jsx";
+import ChatInput from "./chatInput";
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 type MessageWithProfile = Message & {
   profile: Profile | Profile[] | null;
@@ -46,6 +48,14 @@ function Messages({ channelId }: { channelId: number }) {
   const scrollDummyRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const bgColor = useColorModeValue("gray.600", "gray.200");
+
+  const isChatBoxScrolledToBottom =
+    chatBoxRef.current &&
+    chatBoxRef.current.scrollTop >=
+      chatBoxRef.current.scrollHeight - chatBoxRef.current.offsetHeight;
+
+  const isChatBoxScrolledToTop =
+    chatBoxRef.current && chatBoxRef.current.scrollTop === 0;
 
   useEffect(() => {
     (async () => {
@@ -101,14 +111,7 @@ function Messages({ channelId }: { channelId: number }) {
 
       const subscribeChannelUsersUpdate = async () => {
         await supabase
-          .channel("channelUsers")
-          .on(
-            "postgres_changes",
-            { event: "UPDATE", schema: "public", table: "profiles" },
-            () => {
-              getChannelUsers();
-            }
-          )
+          .channel(`channelUsers:${channelId}`)
           .on(
             "postgres_changes",
             {
@@ -137,7 +140,6 @@ function Messages({ channelId }: { channelId: number }) {
             },
             (payload) => {
               setMessages((old) => [...old, payload.new as Message]);
-              setNewMessage.on();
             }
           )
           .subscribe();
@@ -149,28 +151,37 @@ function Messages({ channelId }: { channelId: number }) {
       await subscribeChannelUsersUpdate();
       await scrollToBottom();
     })();
-
-    if (chatBoxRef.current) {
-      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
-    }
   }, [channelId]);
 
   useEffect(() => {
-    if (chatBoxRef.current) {
-      const target = chatBoxRef.current;
-      if (target.scrollTop >= target.scrollHeight - target.offsetHeight) {
-        scrollToBottom();
-      }
+    if (isChatBoxScrolledToBottom) {
+      scrollToBottom();
+      setNewMessage.off();
+    } else {
+      setNewMessage.on();
     }
   }, [messages]);
 
-  function scrollToBottom() {
+  // if (chatBoxRef.current) {
+  //   const target = chatBoxRef.current;
+  //   if (target.scrollTop >= target.scrollHeight - target.offsetHeight) {
+  //     console.log("bottom");
+  //   }
+  // }
+
+  function scrollToBottomDummy() {
     if (scrollDummyRef.current) {
       scrollDummyRef.current.scrollIntoView({
         behavior: "smooth",
         block: "end",
         inline: "nearest",
       });
+    }
+  }
+
+  function scrollToBottom() {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }
 
@@ -182,12 +193,9 @@ function Messages({ channelId }: { channelId: number }) {
         p={2}
         onScroll={(e) => {
           const target = e.target as HTMLDivElement;
-          if (target.scrollTop === 0) {
-            console.log("on top");
-          }
 
           if (target.scrollTop >= target.scrollHeight - target.offsetHeight) {
-            console.log("at bottom");
+            setNewMessage.off();
           }
         }}
         ref={chatBoxRef}
@@ -198,12 +206,8 @@ function Messages({ channelId }: { channelId: number }) {
           </Center>
         )}
         {!!messages.length ? (
-          messages.map((m: Message) => {
+          messages.map((m: Message, i: number) => {
             const u = channelUsers?.find((o) => o.user_id === m.user_id);
-            if (!u)
-              <Box key={m.id} my={2} p={1}>
-                Unknown User Message
-              </Box>;
             return (
               <Stack
                 key={m.id}
@@ -230,7 +234,7 @@ function Messages({ channelId }: { channelId: number }) {
                     align="center"
                   >
                     <Text mx={1} fontWeight="semibold">
-                      {u?.display_name}
+                      {u?.display_name ?? m.user_id ?? "Unknown User"}
                     </Text>
 
                     {timestampId == m.id && (
@@ -239,10 +243,6 @@ function Messages({ channelId }: { channelId: number }) {
                       </Tag>
                     )}
                   </Flex>
-                  {/* <Tooltip
-                    label={moment(m.created_at as string).calendar()}
-                    placement={user && m.user_id === user.id ? "left" : "right"}
-                  > */}
                   <Text
                     options={{
                       disableParsingRawHTML: true,
@@ -270,7 +270,6 @@ function Messages({ channelId }: { channelId: number }) {
                   >
                     {m.content}
                   </Text>
-                  {/* </Tooltip> */}
                 </Flex>
               </Stack>
             );
@@ -278,18 +277,28 @@ function Messages({ channelId }: { channelId: number }) {
         ) : (
           <Center h="100%">No message</Center>
         )}
-        <Box ref={scrollDummyRef} />
       </Box>
       {newMessage && (
-        <Button
+        <Box
           onClick={() => {
             scrollToBottom();
             setNewMessage.off();
           }}
-          variant="ghost"
+          pl={4}
+          roundedTop="md"
+          bg="ButtonFace"
         >
           There is a new message!
-        </Button>
+        </Box>
+      )}
+      {!!user && (
+        <Box p={2} bg="ButtonFace" roundedTop={!newMessage ? "md" : undefined}>
+          <ChatInput
+            scrollToBottom={scrollToBottom}
+            userId={user.id}
+            channelId={channelId}
+          />
+        </Box>
       )}
     </>
   );

@@ -14,9 +14,11 @@ import { MdSend } from "react-icons/md";
 function ChatInput({
   channelId,
   userId,
+  scrollToBottom,
 }: {
   channelId: number;
   userId: string;
+  scrollToBottom: () => void;
 }) {
   const { supabase } = useSupabase();
   //   const { setMessages } = useMessages({ channel });
@@ -46,6 +48,7 @@ function ChatInput({
         } else {
           actions.resetForm();
           actions.setSubmitting(false);
+          scrollToBottom();
         }
       }}
     >
