@@ -61,7 +61,37 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
       <Head>
+        <meta name="title" content={"SupaChat"} />
+        <meta
+          name="description"
+          content={`A chat app made from Supabase, Next.js.`}
+        />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <meta
+          name="keywords"
+          content="chat, supabase, nextjs, fiezt, react, chakra ui"
+        />
+        <meta name="language" content="English" />
+        <meta name="robots" content="index, follow" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.origin} />
+        <meta property="og:title" content={"SupaChat"} />
+        <meta
+          property="og:description"
+          content={`A chat app made from Supabase, Next.js.`}
+        />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.origin} />
+        <meta property="twitter:title" content={"SupaChat"} />
+        <meta
+          property="twitter:description"
+          content={`A chat app made from Supabase, Next.js.`}
+        />
       </Head>
       <DefaultSeo {...pageSEO} />
       <SessionContextProvider

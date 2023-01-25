@@ -16,15 +16,16 @@ import {
 } from "@chakra-ui/react";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { GrGroup } from "react-icons/gr";
 
 function Invite({ channel }: { channel: Channel }) {
   const { supabase, user, channels } = useSupabase();
-
   const router = useRouter();
   const toast = useToast();
+  const title = !channel.name ? `Channel ${channel.id}` : channel.name;
 
   const handleJoin = () => {
     (async () => {
@@ -83,24 +84,54 @@ function Invite({ channel }: { channel: Channel }) {
   };
 
   return (
-    <Center h="100vh">
-      <VStack>
-        <Avatar
-          size={"2xl"}
-          rounded="full"
-          icon={<GrGroup />}
-          src={channel.avatar_url || undefined}
+    <>
+      <Head>
+        <title>{title}</title>
+        <meta name="title" content={title} />
+        <meta name="description" content={`Join the ${title} channel!`} />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.origin} />
+        <meta property="og:title" content={title} />
+        <meta
+          property="og:description"
+          content={`Join the ${title} channel!`}
         />
-        <HStack spacing={1}>
-          <Text>You are about to join</Text>
-          <Text fontWeight="bold">{channel.name ?? channel.id}</Text>
-        </HStack>
-        <Divider />
-        <Button colorScheme={"cyan"} w="100%" onClick={handleJoin}>
-          {channel.is_private ? "Ask to join" : "Join"}
-        </Button>
-      </VStack>
-    </Center>
+        <meta property="og:image" content={channel.avatar_url ?? undefined} />
+
+        {/* Twitter  */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.origin} />
+        <meta property="twitter:title" content={title} />
+        <meta
+          property="twitter:description"
+          content={`Join the ${title} channel!`}
+        />
+        <meta
+          property="twitter:image"
+          content={channel.avatar_url ?? undefined}
+        />
+      </Head>
+      <Center h="100vh">
+        <VStack>
+          <Avatar
+            size={"2xl"}
+            rounded="full"
+            icon={<GrGroup />}
+            src={channel.avatar_url || undefined}
+          />
+          <HStack spacing={1}>
+            <Text>You are about to join</Text>
+            <Text fontWeight="bold">{channel.name ?? channel.id}</Text>
+          </HStack>
+          <Divider />
+          <Button colorScheme={"cyan"} w="100%" onClick={handleJoin}>
+            {channel.is_private ? "Ask to join" : "Join"}
+          </Button>
+        </VStack>
+      </Center>
+    </>
   );
 }
 
