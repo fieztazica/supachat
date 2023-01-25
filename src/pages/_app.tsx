@@ -76,7 +76,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
         {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
+        {/* <meta property="og:type" content="website" />
         <meta
           property="og:url"
           content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`}
@@ -85,16 +85,16 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         <meta
           property="og:description"
           content={`A chat app made from Supabase, Next.js.`}
-        />
+        /> */}
 
         {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
+        {/* <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`} />
         <meta property="twitter:title" content={"SupaChat"} />
         <meta
           property="twitter:description"
           content={`A chat app made from Supabase, Next.js.`}
-        />
+        /> */}
       </Head>
       <DefaultSeo {...pageSEO} />
       <SessionContextProvider

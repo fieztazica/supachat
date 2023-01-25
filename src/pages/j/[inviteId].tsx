@@ -1,4 +1,4 @@
-import { useSupabase } from "@/lib/supabaseClient";
+import { supabaseBeClient, useSupabase } from "@/lib/supabaseClient";
 import { Channel } from "@/types";
 import { Database } from "@/types/supabase";
 import {
@@ -92,7 +92,10 @@ function Invite({ channel }: { channel: Channel }) {
 
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`} />
+        <meta
+          property="og:url"
+          content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`}
+        />
         <meta property="og:title" content={title} />
         <meta
           property="og:description"
@@ -102,7 +105,10 @@ function Invite({ channel }: { channel: Channel }) {
 
         {/* Twitter  */}
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`} />
+        <meta
+          property="twitter:url"
+          content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`}
+        />
         <meta property="twitter:title" content={title} />
         <meta
           property="twitter:description"
@@ -140,18 +146,7 @@ export default Invite;
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const supabase = await createServerSupabaseClient<Database>(context);
-
-  // const sUser = await supabase.auth.getUser();
-
-  // if (!sUser.data.user) {
-  //   return {
-  //     redirect: {
-  //       destination: "/chat",
-  //       permanent: false,
-  //     },
-  //   };
-  // }
+  const supabase = supabaseBeClient;
 
   const inviteId = context.params?.["inviteId"] as string;
 

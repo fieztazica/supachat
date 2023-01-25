@@ -25,7 +25,7 @@ const Home = () => {
   useEffect(() => {
 
     supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log(event);
+      // console.log(event);
       if (event == "PASSWORD_RECOVERY") {
         const newPassword =
           prompt("What would you like your new password to be?") || undefined;
@@ -38,7 +38,7 @@ const Home = () => {
       }
     });
 
-    console.log(localStorage.getItem("chakra-ui-color-mode"))
+    // console.log(localStorage.getItem("chakra-ui-color-mode"))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
