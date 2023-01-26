@@ -29,7 +29,9 @@ function Invite({ channel }: { channel: Channel }) {
 
   const handleJoin = () => {
     (async () => {
-      if (!user || !supabase) return router.push("/chat");
+      if (!user || !supabase) {
+        return router.push(`/login?redirectTo=${encodeURIComponent(window.location.href)}`);
+      }
       if (!!channels.includes(channel))
         return router.push(`/chat/${channel.id}`);
 

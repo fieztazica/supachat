@@ -43,6 +43,8 @@ function Register() {
   const router = useRouter();
   const pwd = useDisclosure();
   const toast = useToast();
+  const redirectTo = router.query["redirectTo"];
+  const redirectToURL = !redirectTo ? null : new URL(redirectTo as string);
 
   const formik = useFormik({
     initialValues: {
@@ -68,8 +70,6 @@ function Register() {
         console.log(error);
         toast({ title: `${error.message}`, status: "error" });
       }
-
-      console.log(data, error);
 
       if (data.user) {
         toast({
@@ -227,7 +227,16 @@ function Register() {
                 align={"start"}
                 justify={"space-between"}
               >
-                <Link as={NextLink} href="/login">
+                <Link
+                  as={NextLink}
+                  href={`/login${
+                    !redirectTo
+                      ? ""
+                      : `?redirectTo=${encodeURIComponent(
+                          redirectTo as string
+                        )}`
+                  }`}
+                >
                   Already have an account?
                 </Link>
               </Stack>

@@ -52,7 +52,7 @@ function SettingsSidebar({ ...props }) {
           leftIcon={<BsFillChatFill />}
           w="full"
           onClick={() => {
-            router.back();
+            router.push("/chat");
           }}
         >
           Back to chat

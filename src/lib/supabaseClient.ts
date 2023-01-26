@@ -110,9 +110,7 @@ export const useSupabase = () => {
 
           await supabase
             .channel(
-              `public:channels:id=in.(${userChannels
-                .map((c) => c.id)
-                .join(",")})`
+              `public:channels`
             )
             .on(
               "postgres_changes",
@@ -123,18 +121,25 @@ export const useSupabase = () => {
                 // filter: `id=in.(${userChannels.map((c) => c.id).join(",")})`,
               },
               (payload: RealtimePostgresChangesPayload<Channel>) => {
-                if (!(userChannels.includes(payload.new as Channel) || userChannels.includes(payload.old as Channel))) return;
+                // if (!(userChannels.includes(payload.new as Channel) || userChannels.includes(payload.old as Channel))) return;
 
-                console.log("channels", payload);
+                const oldChannel = payload.old as Channel;
+                const newChannel = payload.new as Channel;
 
-                setChannels((old) => {
-                  const newChannels = [...old];
-                  const index = newChannels.findIndex(
-                    (c) => c.id === (payload.old as Channel).id
-                  );
-                  newChannels[index] = payload.new as Channel;
-                  return newChannels;
-                });
+                if (userChannels.some((c) => c.id === oldChannel.id || c.id === newChannel.id)) {
+                  // console.log("channels", payload);
+                  // setChannels((old) => {
+                  //   const newChannels = [...old];
+                  //   const index = old.findIndex(
+                  //     (c) => c.id === oldChannel.id
+                  //   );
+                  //   newChannels.splice(index, 1, newChannel);
+                  //   return newChannels;
+                  // });
+                  (async () => {
+                    setChannels(await getUserChannels());
+                  })
+                }
               }
             )
             .subscribe();

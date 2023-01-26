@@ -27,6 +27,7 @@ import { useRef, useState, useEffect } from "react";
 import Markdown from "markdown-to-jsx";
 import ChatInput from "./chatInput";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import MessageComponent from "./message";
 
 type MessageWithProfile = Message & {
   profile: Profile | Profile[] | null;
@@ -47,7 +48,8 @@ function Messages({ channelId }: { channelId: number }) {
   const [newMessage, setNewMessage] = useBoolean(false);
   const scrollDummyRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
-  const bgColor = useColorModeValue("gray.600", "gray.200");
+  const bgColor = useColorModeValue("gray.100", "gray.700");
+  const mBgColor = useColorModeValue("gray.100", "gray.900");
 
   const isChatBoxScrolledToBottom =
     chatBoxRef.current &&
@@ -190,7 +192,7 @@ function Messages({ channelId }: { channelId: number }) {
       <Box
         flex="1"
         overflowY={"auto"}
-        p={2}
+        p={1}
         onScroll={(e) => {
           const target = e.target as HTMLDivElement;
 
@@ -207,71 +209,17 @@ function Messages({ channelId }: { channelId: number }) {
         )}
         {!!messages.length ? (
           messages.map((m: Message, i: number) => {
-            const u = channelUsers?.find((o) => o.user_id === m.user_id);
+            const author = channelUsers?.find((o) => o.user_id === m.user_id);
+            const prevMess = messages[i - 1] || undefined;
             return (
-              <Stack
-                key={m.id}
-                align="center"
-                direction={
-                  user && m.user_id === user.id ? "row-reverse" : "row"
-                }
-                my={2}
-                p={1}
-                rounded={"md"}
-                // _hover={{ bg: bgColorHover }}
-                onMouseOver={() => setTimestampId(m.id)}
-                onMouseOut={() => setTimestampId(null)}
-              >
-                <Avatar size="sm" name={u?.display_name} src={u?.avatar_url} />
-                <Flex
-                  direction={"column"}
-                  align={user && m.user_id === user.id ? "end" : "start"}
-                >
-                  <Flex
-                    direction={
-                      user && m.user_id === user.id ? "row-reverse" : "row"
-                    }
-                    align="center"
-                  >
-                    <Text mx={1} fontWeight="semibold">
-                      {u?.display_name ?? m.user_id ?? "Unknown User"}
-                    </Text>
-
-                    {timestampId == m.id && (
-                      <Tag size={"sm"}>
-                        {moment(m.created_at as string).calendar()}
-                      </Tag>
-                    )}
-                  </Flex>
-                  <Text
-                    options={{
-                      disableParsingRawHTML: true,
-                      forceBlock: true,
-                      overrides: {
-                        a: Text,
-                        code: Code,
-                        li: ListItem,
-                        ul: UnorderedList,
-                        ol: OrderedList,
-                        h1: Text,
-                        h2: Text,
-                        h3: Text,
-                        h4: Text,
-                        h5: Text,
-                        h6: Text,
-                        h7: Text,
-                      },
-                    }}
-                    as={Markdown}
-                    color={bgColor}
-                    rounded={"full"}
-                    px={2}
-                    w="fit-content"
-                  >
-                    {m.content}
-                  </Text>
-                </Flex>
-              </Stack>
+              <Box key={m.id} _hover={{ bg: mBgColor }} rounded={"md"} px={1}>
+                <MessageComponent
+                  key={m.id}
+                  m={m}
+                  author={author}
+                  prevM={prevMess}
+                />
+              </Box>
             );
           })
         ) : (
@@ -286,13 +234,18 @@ function Messages({ channelId }: { channelId: number }) {
           }}
           pl={4}
           roundedTop="md"
-          bg="ButtonFace"
+          bg={bgColor}
         >
           There is a new message!
         </Box>
       )}
       {!!user && (
-        <Box p={2} bg="ButtonFace" roundedTop={!newMessage ? "md" : undefined}>
+        <Box
+          mt={newMessage ? undefined : 4}
+          p={2}
+          bg={bgColor}
+          roundedTop={!newMessage ? "md" : undefined}
+        >
           <ChatInput
             scrollToBottom={scrollToBottom}
             userId={user.id}

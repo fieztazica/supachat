@@ -33,7 +33,7 @@ import NextLink from "next/link";
 import SidebarMenu from "../../sidebarMenu";
 import SideBarButton from "../../sidebarButton";
 import AvatarStatus from "../../avatarStatus";
-import Channels from "../channels";
+import Channels from "../../channels";
 import OnlineUsers from "@/components/onlineUsers";
 import CreateChannelButton from "@/components/createChannelButton";
 import NotiPopover from "@/components/notiPopover";
@@ -73,14 +73,6 @@ function ChatSideBar({ ...props }) {
           <NotiPopover />
         </Flex>
         <Divider />
-        <InputGroup pr={1}>
-          <InputLeftElement pointerEvents="none">🔍</InputLeftElement>
-          <Input placeholder="Search" />
-        </InputGroup>
-        <HStack align={"center"}>
-          <Heading size={["md", "sm"]}>Channels</Heading>
-          <CreateChannelButton />
-        </HStack>
         <Channels pr={1} />
       </Stack>
       <Divider mt={2} />

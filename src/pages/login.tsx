@@ -43,6 +43,7 @@ function Login() {
   const router = useRouter();
   const pwd = useDisclosure();
   const toast = useToast();
+  const redirectTo = router.query["redirectTo"] as string;
   // const [captchaToken, setCaptchaToken] = useState<string>();
   // const captcha = useRef();
 
@@ -83,8 +84,11 @@ function Login() {
   }
 
   useEffect(() => {
-    if (session !== null) router.reload();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (session !== null) {
+      if (!redirectTo) router.reload();
+      else router.push(redirectTo ?? "/chat");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   return (
@@ -143,7 +147,14 @@ function Login() {
                 </InputGroup>
               </FormControl>
               <Stack direction="row" align={"start"} justify={"space-between"}>
-                <Link as={NextLink} href="/register">
+                <Link
+                  as={NextLink}
+                  href={`/register${
+                    !redirectTo
+                      ? ""
+                      : `?redirectTo=${encodeURIComponent(redirectTo as string)}`
+                  }`}
+                >
                   <Text fontSize={["sm", "md"]}>
                     Don&#39;t have an account?
                   </Text>
@@ -190,9 +201,9 @@ export default Login;
 
 Login.defaultProps = {
   meta: {
-    title: 'SupaChat | Sign In'
-  }
-}
+    title: "SupaChat | Sign In",
+  },
+};
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
