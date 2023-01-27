@@ -10,7 +10,7 @@ function ChatLayout({ children }: { children: JSX.Element }) {
           h="$100vh"
           p="2"
           borderRight={"1px"}
-          borderColor={useColorModeValue("gray.800", "white")}
+          borderColor={useColorModeValue("gray.200", "gray.700")}
         />
       }
     >

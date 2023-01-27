@@ -3,6 +3,7 @@ import { Channel } from "@/types";
 import {
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   IconButton,
   Input,
   InputGroup,
@@ -83,6 +84,7 @@ function ChatInput({
           <Field name="message">
             {({ field, form }: FieldProps<string, { message: string }>) => (
               <FormControl isInvalid={form.errors.message ? true : false}>
+                <FormErrorMessage mb={1}>{form.errors.message}</FormErrorMessage>
                 <InputGroup>
                   <Input
                     ref={inputRef}
@@ -103,7 +105,6 @@ function ChatInput({
                     />
                   </InputRightElement>
                 </InputGroup>
-                <FormErrorMessage>{form.errors.message}</FormErrorMessage>
               </FormControl>
             )}
           </Field>

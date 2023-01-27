@@ -4,6 +4,7 @@ import {
   Avatar,
   Box,
   Button,
+  Divider,
   Flex,
   HStack,
   Input,
@@ -95,6 +96,8 @@ function ManageNicknamesModal({ channel }: { channel: Channel }) {
               </InputGroup>
             </VStack>
           </ModalHeader>
+
+          <Divider />
           <ModalCloseButton />
           <ModalBody>
             <Box maxH={"xs"} overflow={"auto"}>

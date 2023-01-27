@@ -8,6 +8,7 @@ import {
   Flex,
   Tag,
   Text,
+  useColorModeValue,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -23,6 +24,7 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
   const { user, supabase } = useSupabase();
   const toast = useToast();
   const router = useRouter();
+  const borderColor = useColorModeValue("gray.200", "gray.700")
 
   if (!user) return null;
 
@@ -134,6 +136,7 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
     <Flex
       direction={"column"}
       borderLeft={"1px"}
+      borderColor={borderColor}
       minW="xs"
       maxW="xs"
       maxH={"$100vh"}

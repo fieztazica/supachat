@@ -18,6 +18,7 @@ import {
   Stack,
   Tag,
   Text,
+  useColorModeValue,
   useDisclosure,
   useToast,
   VStack,
@@ -31,7 +32,7 @@ import { MdInfoOutline } from "react-icons/md";
 function Channel({ activeChannel, ...props }: { activeChannel: Channel }) {
   const RightBarState = useDisclosure({ defaultIsOpen: true });
   const { user, supabase, channels } = useSupabase();
-  
+  const borderColor = useColorModeValue("gray.200", "gray.700");
 
   if (!user) return null;
 
@@ -53,6 +54,7 @@ function Channel({ activeChannel, ...props }: { activeChannel: Channel }) {
             p={2}
             justifyContent={"space-between"}
             borderBottom={"1px"}
+            borderColor={borderColor}
           >
             <Heading size="md">
               {!channel.name ? `Channel ${channel.id}` : channel.name}
@@ -67,9 +69,7 @@ function Channel({ activeChannel, ...props }: { activeChannel: Channel }) {
           </Flex>
           <Messages channelId={channel.id} />
         </Flex>
-        {RightBarState.isOpen && (
-          <ChannelRightBar channel={channel}/>
-        )}
+        {RightBarState.isOpen && <ChannelRightBar channel={channel} />}
       </Flex>
     </>
   );

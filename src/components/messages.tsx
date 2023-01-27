@@ -40,7 +40,6 @@ function Messages({ channelId }: { channelId: number }) {
     | null
     | undefined
   >([]);
-
   // const [timestampId, setTimestampId] = useState<string | null>(null);
   const [isHover, setIsHover] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -49,8 +48,7 @@ function Messages({ channelId }: { channelId: number }) {
   const [newMessage, setNewMessage] = useBoolean(false);
   const scrollDummyRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
-  const bgColor = useColorModeValue("gray.100", "gray.700");
-  const mBgColor = useColorModeValue("gray.100", "gray.900");
+  const hoverNewMessageBgColor = useColorModeValue("gray.100", "gray.900");
 
   const isChatBoxScrolledToBottom =
     chatBoxRef.current &&
@@ -64,11 +62,11 @@ function Messages({ channelId }: { channelId: number }) {
     (async () => {
       const getMessages = async () => {
         setLoading.on();
-        let { data: messages, error } = await supabase
+        const { data, error } = await supabase
           .from("messages")
           .select(`*`)
           .eq("channel_id", channelId)
-          .order("created_at");
+          .order("created_at", { ascending: false });
 
         //   console.log(messages, error);
         if (error) {
@@ -82,8 +80,8 @@ function Messages({ channelId }: { channelId: number }) {
             isClosable: true,
           });
         }
-        if (messages) {
-          setMessages(messages);
+        if (data) {
+          setMessages(data);
           setLoading.off();
         }
       };
@@ -142,7 +140,7 @@ function Messages({ channelId }: { channelId: number }) {
               filter: `channel_id=eq.${channelId}`,
             },
             (payload) => {
-              setMessages((old) => [...old, payload.new as Message]);
+              setMessages((old) => [payload.new as Message, ...old]);
             }
           )
           .subscribe();
@@ -204,6 +202,7 @@ function Messages({ channelId }: { channelId: number }) {
         ref={chatBoxRef}
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
+        // bgColor={chatBoxBgColor}
       >
         {loading && (
           <Center>
@@ -211,18 +210,21 @@ function Messages({ channelId }: { channelId: number }) {
           </Center>
         )}
         {!!messages.length ? (
-          messages.map((m: Message, i: number) => {
-            const author = channelUsers?.find((o) => o.user_id === m.user_id);
-            const prevMess = messages[i - 1] || undefined;
-            return (
-              <MessageComponent
-                key={m.id}
-                m={m}
-                author={author}
-                prevM={prevMess}
-              />
-            );
-          })
+          messages
+            .slice()
+            .reverse()
+            .map((m: Message, i: number) => {
+              const author = channelUsers?.find((o) => o.user_id === m.user_id);
+              const prevMess = messages.slice().reverse()[i - 1] || undefined;
+              return (
+                <MessageComponent
+                  key={m.id}
+                  m={m}
+                  author={author}
+                  prevM={prevMess}
+                />
+              );
+            })
         ) : (
           <Center h="100%">No message</Center>
         )}
@@ -234,20 +236,18 @@ function Messages({ channelId }: { channelId: number }) {
             setNewMessage.off();
           }}
           pl={4}
-          roundedTop="md"
-          bg={bgColor}
+          cursor="pointer"
           transition={"0.3s"}
-          _hover={{ opacity: "70%", 
-          filter: "brightness(1.4)" }}
+          _hover={{ bg: hoverNewMessageBgColor }}
         >
           There is a new message!
         </Box>
       )}
       {!!user && (
         <Box
-          mt={newMessage ? undefined : 4}
+          // mt={newMessage ? undefined : 4}
           p={2}
-          bg={bgColor}
+          // bg={bgColor}
           roundedTop={!newMessage ? "md" : undefined}
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}

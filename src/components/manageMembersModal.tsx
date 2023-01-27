@@ -36,6 +36,7 @@ import {
   useColorModeValue,
   useToast,
   VStack,
+  Divider,
 } from "@chakra-ui/react";
 import { useRef, useState, useEffect } from "react";
 // import { TbDotsVertical } from "react-icons/tb";
@@ -175,6 +176,7 @@ function ManageMembersModal({ channel }: { channel: Channel }) {
               </InputGroup>
             </VStack>
           </ModalHeader>
+          <Divider />
           <ModalCloseButton />
           <ModalBody>
             <Tabs isFitted>

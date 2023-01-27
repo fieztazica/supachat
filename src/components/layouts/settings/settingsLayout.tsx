@@ -8,7 +8,7 @@ function SettingsLayout({ children }: { children: JSX.Element }) {
       leftSidebar={
         <SettingsSidebar
           borderRight={"1px"}
-          borderColor={useColorModeValue("gray.800", "white")}
+          borderColor={useColorModeValue("gray.200", "gray.700")}
           p={2}
           h="$100vh"
         />
