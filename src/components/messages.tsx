@@ -170,6 +170,8 @@ function Messages({ channelId }: { channelId: number }) {
     ) {
       setNewMessage.on();
     }
+
+    if (!messages.length) setNewMessage.off()
   }, [messages]);
 
   useEffect(() => {
