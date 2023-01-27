@@ -162,16 +162,9 @@ function Messages({ channelId }: { channelId: number }) {
     if (chatBoxPos === "bottom" || isChatBoxScrolledToBottom) {
       scrollToBottom();
       setNewMessage.off();
-    }
-
-    if (
-      !chatBoxPos ||
-      (!isChatBoxScrolledToBottom && !isChatBoxScrolledToTop)
-    ) {
+    } else {
       setNewMessage.on();
-    }
-
-    if (!messages.length) setNewMessage.off()
+    } 
   }, [messages]);
 
   useEffect(() => {
@@ -196,7 +189,7 @@ function Messages({ channelId }: { channelId: number }) {
           // console.log(data);
 
           if (data) setMessages((old) => [...old, ...data]);
-          if (!error && !data.length) setIsAtTop(true)
+          if (!error && !data.length) setIsAtTop(true);
         } catch (error: any) {
           console.error(error);
           toast({

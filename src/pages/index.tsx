@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
   Link,
+  Icon,
   useColorMode,
   Divider,
   Switch,
@@ -17,13 +18,13 @@ import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import NextLink from "next/link";
 import React, { useEffect } from "react";
+import { FaGithub } from "react-icons/fa";
 
 const Home = () => {
   const { toggleColorMode, colorMode } = useColorMode();
   const { profile, supabase } = useSupabase();
 
   useEffect(() => {
-
     supabase.auth.onAuthStateChange(async (event, session) => {
       // console.log(event);
       if (event == "PASSWORD_RECOVERY") {
@@ -82,12 +83,22 @@ const Home = () => {
         </Center>
       </Stack>
       <Center flex="1" p={4}>
-        <Switch
-          colorScheme={"cyan"}
-          size="lg"
-          isChecked={colorMode === "light" ? false : true}
-          onChange={toggleColorMode}
-        />
+        <Stack direction={["column-reverse", "row"]} align="center">
+          <Switch
+            colorScheme={"cyan"}
+            size="lg"
+            isChecked={colorMode === "light" ? false : true}
+            onChange={toggleColorMode}
+          />
+          <Link
+            display={"flex"}
+            isExternal
+            href={"https://github.com/fiezt1492/chat-app-supabase"}
+            alignSelf="center"
+          >
+            <Icon as={FaGithub} boxSize={[10, 7]} />
+          </Link>
+        </Stack>
       </Center>
     </Flex>
   );
@@ -121,6 +132,6 @@ export default Home;
 
 Home.defaultProps = {
   meta: {
-    title: "SupaChat | Home",
+    title: "SupaChat",
   },
 };
