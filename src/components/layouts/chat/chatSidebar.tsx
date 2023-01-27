@@ -63,7 +63,8 @@ function ChatSideBar({ ...props }) {
         <Flex align={"center"} justifyContent="space-between">
           <NextLink href="/chat">
             <Heading
-              _hover={{ opacity: "80%" }}
+              transition={"0.3s"}
+              _hover={{  color:"gray" }}
               rounded="md"
               size={["xs", "md"]}
             >

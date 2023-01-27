@@ -148,17 +148,20 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
             {channel.is_private ? `Private` : `Public`}
           </Tag>
           <Divider />
-          <ChangeChannelNameButton channel={channel} />
-          <ChangeChannelAvatarButton channel={channel} />
-          <ManageMembersModal channel={channel} />
-          <ManageNicknamesModal />
+
           {channel.owner_id === user.id && (
-            <Button w="100%" onClick={togglePublicity}>
-              {channel.is_private
-                ? "Open channel to public"
-                : "Make channel private"}
-            </Button>
+            <>
+              <ChangeChannelNameButton channel={channel} />
+              <ChangeChannelAvatarButton channel={channel} />
+              <Button w="100%" onClick={togglePublicity}>
+                {channel.is_private
+                  ? "Open channel to public"
+                  : "Make channel private"}
+              </Button>
+            </>
           )}
+          <ManageMembersModal channel={channel} />
+          <ManageNicknamesModal channel={channel} />
           <Divider />
           <Button
             leftIcon={<CgCornerUpLeft />}

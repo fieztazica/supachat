@@ -46,7 +46,7 @@ export default Chat;
 
 Chat.defaultProps = {
   meta: {
-    title: "SupaChat | App",
+    title: "SupaChat | Chat",
   },
 };
 

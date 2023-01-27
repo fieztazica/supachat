@@ -35,6 +35,7 @@ function Message({
 }) {
   const { user } = useSupabase();
   const bgColor = useColorModeValue("gray.600", "gray.200");
+  const mBgColor = useColorModeValue("gray.100", "gray.900");
   if (!user) return null;
   const shouldRenderMHeader = !!prevM ? prevM.user_id !== m.user_id : true;
   const isMyMessage = m.user_id === user.id;
@@ -46,6 +47,15 @@ function Message({
         direction={isMyMessage ? "row-reverse" : "row"}
         mt={shouldRenderMHeader ? 2 : undefined}
         rounded={"md"}
+        transition={"0.3s"}
+        _hover={{bg: mBgColor}}
+        px={2}
+        ml={
+          !!isMyMessage ? undefined : !shouldRenderMHeader ? 10 : undefined
+        }
+        mr={
+          !isMyMessage ? undefined : !shouldRenderMHeader ? 10 : undefined
+        }
       >
         {shouldRenderMHeader && (
           <Avatar
@@ -86,12 +96,6 @@ function Message({
             color={bgColor}
             rounded={"full"}
             w="fit-content"
-            ml={
-              !!isMyMessage ? undefined : !shouldRenderMHeader ? 10 : undefined
-            }
-            mr={
-              !isMyMessage ? undefined : !shouldRenderMHeader ? 10 : undefined
-            }
           >
             {m.content}
           </Text>

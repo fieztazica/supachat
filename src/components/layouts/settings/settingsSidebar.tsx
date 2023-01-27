@@ -26,7 +26,14 @@ function SettingsSidebar({ ...props }) {
     <Flex w={"xs"} direction="column" {...props}>
       <Stack flex="1" direction={"column"} overflow="hidden">
         <NextLink href="/chat">
-          <Heading size={["sm", "md"]}>SupaChat</Heading>
+          <Heading
+            size={["sm", "md"]}
+            transition={"0.3s"}
+            _hover={{ color: "gray" }}
+            rounded="md"
+          >
+            SupaChat
+          </Heading>
         </NextLink>
         <Divider />
         <AppBreadcrumbs

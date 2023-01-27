@@ -41,7 +41,8 @@ function Messages({ channelId }: { channelId: number }) {
     | undefined
   >([]);
 
-  const [timestampId, setTimestampId] = useState<string | null>(null);
+  // const [timestampId, setTimestampId] = useState<string | null>(null);
+  const [isHover, setIsHover] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useBoolean(true);
   const toast = useToast();
@@ -201,6 +202,8 @@ function Messages({ channelId }: { channelId: number }) {
           }
         }}
         ref={chatBoxRef}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
       >
         {loading && (
           <Center>
@@ -212,14 +215,12 @@ function Messages({ channelId }: { channelId: number }) {
             const author = channelUsers?.find((o) => o.user_id === m.user_id);
             const prevMess = messages[i - 1] || undefined;
             return (
-              <Box key={m.id} _hover={{ bg: mBgColor }} rounded={"md"} px={1}>
-                <MessageComponent
-                  key={m.id}
-                  m={m}
-                  author={author}
-                  prevM={prevMess}
-                />
-              </Box>
+              <MessageComponent
+                key={m.id}
+                m={m}
+                author={author}
+                prevM={prevMess}
+              />
             );
           })
         ) : (
@@ -235,6 +236,9 @@ function Messages({ channelId }: { channelId: number }) {
           pl={4}
           roundedTop="md"
           bg={bgColor}
+          transition={"0.3s"}
+          _hover={{ opacity: "70%", 
+          filter: "brightness(1.4)" }}
         >
           There is a new message!
         </Box>
@@ -245,11 +249,14 @@ function Messages({ channelId }: { channelId: number }) {
           p={2}
           bg={bgColor}
           roundedTop={!newMessage ? "md" : undefined}
+          onMouseEnter={() => setIsHover(true)}
+          onMouseLeave={() => setIsHover(false)}
         >
           <ChatInput
             scrollToBottom={scrollToBottom}
             userId={user.id}
             channelId={channelId}
+            isHover={isHover}
           />
         </Box>
       )}

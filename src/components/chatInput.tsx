@@ -9,19 +9,45 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import { Field, FieldProps, Form, Formik } from "formik";
+import { useEffect, useRef } from "react";
 import { MdSend } from "react-icons/md";
 
 function ChatInput({
   channelId,
   userId,
   scrollToBottom,
+  isHover,
 }: {
   channelId: number;
   userId: string;
   scrollToBottom: () => void;
+  isHover: boolean;
 }) {
   const { supabase } = useSupabase();
-  //   const { setMessages } = useMessages({ channel });
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const keyDownHandler = (event: KeyboardEvent) => {
+      if (event.key.length === 1) {
+        inputRef.current?.focus();
+      }
+
+      if (
+        (event.key === "Escape" || event.code === "Escape") &&
+        document.activeElement === inputRef.current
+      ) {
+        inputRef.current?.blur();
+      }
+    };
+
+    if (isHover) {
+      document.addEventListener("keydown", keyDownHandler);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", keyDownHandler);
+    };
+  }, [isHover]);
 
   return (
     <Formik
@@ -58,7 +84,14 @@ function ChatInput({
             {({ field, form }: FieldProps<string, { message: string }>) => (
               <FormControl isInvalid={form.errors.message ? true : false}>
                 <InputGroup>
-                  <Input isRequired placeholder="Say s0m3th1ng" {...field} />
+                  <Input
+                    ref={inputRef}
+                    isRequired
+                    placeholder="Say s0m3th1ng"
+                    type={"text"}
+                    autoComplete="off"
+                    {...field}
+                  />
                   <InputRightElement>
                     <IconButton
                       icon={<MdSend />}
