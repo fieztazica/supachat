@@ -6,6 +6,7 @@ import {
   Button,
   Divider,
   Flex,
+  Link,
   Tag,
   Text,
   useColorModeValue,
@@ -145,7 +146,7 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
       <Box w="$100vw" overflow={"auto"} p={4}>
         <VStack minW="$100vw">
           {/* <ChannelAvatar channel={channel} /> */}
-          <Avatar src={channel.avatar_url ?? undefined} />
+          <Avatar src={channel.avatar_url ?? undefined} as={Link} href={channel?.avatar_url} isExternal />
           <Text>{channel.name ?? channel.id}</Text>
           <Tag colorScheme={channel.is_private ? "purple" : "cyan"}>
             {channel.is_private ? `Private` : `Public`}

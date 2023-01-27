@@ -28,6 +28,7 @@ import Markdown from "markdown-to-jsx";
 import ChatInput from "./chatInput";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import MessageComponent from "./message";
+import { lt } from "lodash";
 
 type MessageWithProfile = Message & {
   profile: Profile | Profile[] | null;
@@ -40,10 +41,11 @@ function Messages({ channelId }: { channelId: number }) {
     | null
     | undefined
   >([]);
-  // const [timestampId, setTimestampId] = useState<string | null>(null);
   const [isHover, setIsHover] = useState<boolean>(false);
+  const [chatBoxPos, setChatBoxPos] = useState<"top" | "bottom" | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useBoolean(true);
+  const [isAtTop, setIsAtTop] = useState<boolean>(false);
   const toast = useToast();
   const [newMessage, setNewMessage] = useBoolean(false);
   const scrollDummyRef = useRef<HTMLDivElement>(null);
@@ -61,17 +63,21 @@ function Messages({ channelId }: { channelId: number }) {
   useEffect(() => {
     (async () => {
       const getMessages = async () => {
-        setLoading.on();
-        const { data, error } = await supabase
-          .from("messages")
-          .select(`*`)
-          .eq("channel_id", channelId)
-          .order("created_at", { ascending: false });
+        try {
+          setLoading.on();
+          const { data, error } = await supabase
+            .from("messages")
+            .select(`*`)
+            .eq("channel_id", channelId)
+            .order("created_at", { ascending: false })
+            .limit(50);
 
-        //   console.log(messages, error);
-        if (error) {
+          if (error) throw error;
+
+          if (data) setMessages(data);
+        } catch (error: any) {
+          console.error(error);
           setMessages([]);
-          setLoading.off();
           toast({
             title: `There was an error occurred when fetching messages. Please reload the page!`,
             description: `${error.message}`,
@@ -79,9 +85,7 @@ function Messages({ channelId }: { channelId: number }) {
             duration: 10000,
             isClosable: true,
           });
-        }
-        if (data) {
-          setMessages(data);
+        } finally {
           setLoading.off();
         }
       };
@@ -155,20 +159,57 @@ function Messages({ channelId }: { channelId: number }) {
   }, [channelId]);
 
   useEffect(() => {
-    if (isChatBoxScrolledToBottom) {
+    if (chatBoxPos === "bottom" || isChatBoxScrolledToBottom) {
       scrollToBottom();
       setNewMessage.off();
-    } else {
+    }
+
+    if (
+      !chatBoxPos ||
+      (!isChatBoxScrolledToBottom && !isChatBoxScrolledToTop)
+    ) {
       setNewMessage.on();
     }
   }, [messages]);
 
-  // if (chatBoxRef.current) {
-  //   const target = chatBoxRef.current;
-  //   if (target.scrollTop >= target.scrollHeight - target.offsetHeight) {
-  //     console.log("bottom");
-  //   }
-  // }
+  useEffect(() => {
+    // console.log(chatBoxPos);
+    if (chatBoxPos === "bottom") {
+      setNewMessage.off();
+    }
+
+    if (chatBoxPos == "top" && !!messages.length && !isAtTop) {
+      (async () => {
+        try {
+          setLoading.on();
+          const { data, error } = await supabase
+            .from("messages")
+            .select(`*`)
+            .eq("channel_id", channelId)
+            .order("created_at", { ascending: false })
+            .lt("created_at", messages[messages.length - 1].created_at)
+            .limit(50);
+
+          if (error) throw error;
+          // console.log(data);
+
+          if (data) setMessages((old) => [...old, ...data]);
+          if (!error && !data.length) setIsAtTop(true)
+        } catch (error: any) {
+          console.error(error);
+          toast({
+            title: `There was an error occurred when fetching messages. Please reload the page!`,
+            description: `${error.message}`,
+            status: "error",
+            duration: 10000,
+            isClosable: true,
+          });
+        } finally {
+          setLoading.off();
+        }
+      })();
+    }
+  }, [chatBoxPos]);
 
   function scrollToBottomDummy() {
     if (scrollDummyRef.current) {
@@ -195,9 +236,15 @@ function Messages({ channelId }: { channelId: number }) {
         onScroll={(e) => {
           const target = e.target as HTMLDivElement;
 
-          if (target.scrollTop >= target.scrollHeight - target.offsetHeight) {
-            setNewMessage.off();
-          }
+          const isScrolledToBottom =
+            target &&
+            target.scrollTop >= target.scrollHeight - target.offsetHeight;
+
+          const isScrolledToTop = target && target.scrollTop === 0;
+
+          if (isScrolledToBottom && !isScrolledToTop) setChatBoxPos("bottom");
+          else if (!isScrolledToBottom && isScrolledToTop) setChatBoxPos("top");
+          else if (!isScrolledToBottom && !isScrolledToTop) setChatBoxPos(null);
         }}
         ref={chatBoxRef}
         onMouseEnter={() => setIsHover(true)}
@@ -205,7 +252,7 @@ function Messages({ channelId }: { channelId: number }) {
         // bgColor={chatBoxBgColor}
       >
         {loading && (
-          <Center>
+          <Center py={4}>
             <Spinner />
           </Center>
         )}

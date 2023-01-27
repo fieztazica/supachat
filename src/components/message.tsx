@@ -4,6 +4,7 @@ import {
   Box,
   Code,
   Flex,
+  Link,
   ListItem,
   OrderedList,
   Stack,
@@ -41,67 +42,79 @@ function Message({
   const isMyMessage = m.user_id === user.id;
 
   return (
-    <Tooltip label={moment(m.created_at as string).calendar()} {...props}>
-      <Stack
-        align="center"
-        direction={isMyMessage ? "row-reverse" : "row"}
-        mt={shouldRenderMHeader ? 2 : undefined}
-        rounded={"md"}
-        transition={"0.3s"}
-        _hover={{bg: mBgColor}}
-        px={2}
-        ml={
-          !!isMyMessage ? undefined : !shouldRenderMHeader ? 10 : undefined
-        }
-        mr={
-          !isMyMessage ? undefined : !shouldRenderMHeader ? 10 : undefined
-        }
-      >
-        {shouldRenderMHeader && (
-          <Avatar
-            size="sm"
-            name={author?.display_name}
-            src={author?.avatar_url}
-            boxSize="8"
-          />
-        )}
-        <Flex direction={"column"} align={isMyMessage ? "end" : "start"}>
-          <Flex direction={isMyMessage ? "row-reverse" : "row"} align="center">
-            {shouldRenderMHeader && (
-              <Text fontWeight="semibold">
-                {author?.display_name ?? m.user_id ?? "Unknown User"}
-              </Text>
-            )}
+    <Flex
+      w="100%"
+      direction={isMyMessage ? "row-reverse" : "row"}
+      px={1}
+      {...props}
+    >
+      <Tooltip label={moment(m.created_at as string).calendar()}>
+        <Stack
+          align="center"
+          direction={isMyMessage ? "row-reverse" : "row"}
+          mt={shouldRenderMHeader ? 1 : 0}
+          rounded={"md"}
+          transition={"0.3s"}
+          _hover={{ bg: mBgColor }}
+          ml={!!isMyMessage ? undefined : !shouldRenderMHeader ? 10 : undefined}
+          mr={!isMyMessage ? undefined : !shouldRenderMHeader ? 10 : undefined}
+          w={"fit-content"}
+          px={2}
+        >
+          {shouldRenderMHeader && (
+            <Avatar
+              size="sm"
+              name={author?.display_name}
+              src={author?.avatar_url}
+              boxSize="8"
+              // cursor={"pointer"}
+              as={Link}
+              href={author?.avatar_url}
+              isExternal
+            />
+          )}
+          <Flex direction={"column"} align={isMyMessage ? "end" : "start"}>
+            <Flex
+              direction={isMyMessage ? "row-reverse" : "row"}
+              align="center"
+            >
+              {shouldRenderMHeader && (
+                <Text as={Link} fontWeight="semibold" cursor={"pointer"} title={m.user_id}>
+                  {author?.display_name ?? m.user_id ?? "Unknown User"}
+                </Text>
+              )}
+            </Flex>
+            <Text
+              options={{
+                disableParsingRawHTML: true,
+                forceBlock: true,
+                overrides: {
+                  a: Text,
+                  code: Code,
+                  li: ListItem,
+                  ul: UnorderedList,
+                  ol: OrderedList,
+                  h1: Text,
+                  h2: Text,
+                  h3: Text,
+                  h4: Text,
+                  h5: Text,
+                  h6: Text,
+                  h7: Text,
+                },
+              }}
+              as={Markdown}
+              color={bgColor}
+              rounded={"full"}
+              w="fit-content"
+              title={m.id}
+            >
+              {m.content}
+            </Text>
           </Flex>
-          <Text
-            options={{
-              disableParsingRawHTML: true,
-              forceBlock: true,
-              overrides: {
-                a: Text,
-                code: Code,
-                li: ListItem,
-                ul: UnorderedList,
-                ol: OrderedList,
-                h1: Text,
-                h2: Text,
-                h3: Text,
-                h4: Text,
-                h5: Text,
-                h6: Text,
-                h7: Text,
-              },
-            }}
-            as={Markdown}
-            color={bgColor}
-            rounded={"full"}
-            w="fit-content"
-          >
-            {m.content}
-          </Text>
-        </Flex>
-      </Stack>
-    </Tooltip>
+        </Stack>
+      </Tooltip>
+    </Flex>
   );
 }
 
