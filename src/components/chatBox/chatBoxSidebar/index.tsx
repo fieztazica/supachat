@@ -10,6 +10,7 @@ import {
   Tag,
   Text,
   useColorModeValue,
+  useForceUpdate,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -26,6 +27,7 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
   const toast = useToast();
   const router = useRouter();
   const borderColor = useColorModeValue("gray.200", "gray.700")
+  const forceUpdate = useForceUpdate()
 
   if (!user) return null;
 
@@ -43,6 +45,7 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
       } else {
         toast({ title: `Succeed!`, status: "success" });
       }
+      forceUpdate();
     })();
   };
 
@@ -109,6 +112,8 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
       }
       //If not owner do a normal leave
       else leave();
+      
+      forceUpdate();
     })();
   };
 

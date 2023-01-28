@@ -1,8 +1,14 @@
 import { useSupabase } from "@/lib/supabaseClient";
 import { Channel } from "@/types";
-import { Button, Input, InputGroup, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  Input,
+  InputGroup,
+  useForceUpdate,
+  useToast,
+} from "@chakra-ui/react";
 import { ChangeEvent, useState, useRef, useEffect } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 function ChangeChannelAvatarButton({ channel }: { channel: Channel }) {
   const [uploading, setUploading] = useState<boolean>(false);
@@ -10,6 +16,7 @@ function ChangeChannelAvatarButton({ channel }: { channel: Channel }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File>();
   const { supabase, user } = useSupabase();
+  const forceUpdate = useForceUpdate();
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -65,6 +72,8 @@ function ChangeChannelAvatarButton({ channel }: { channel: Channel }) {
       }
     };
     if (!!file) upload();
+
+    forceUpdate();
   }, [file]);
 
   return (

@@ -1,6 +1,6 @@
-import ChannelRightBar from "@/components/channelRightBar";
+import ChannelRightBar from "@/components/chatBox/chatBoxSidebar";
 import ChatLayout from "@/components/layouts/chat/chatLayout";
-import Messages from "@/components/messages";
+import Messages from "@/components/chatBox/messages";
 import OnlineUsers from "@/components/onlineUsers";
 import { useSupabase } from "@/lib/supabaseClient";
 import { Channel } from "@/types";

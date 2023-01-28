@@ -1,4 +1,4 @@
-import AppBreadcrumbs from "@/components/appBreadcrumbs";
+import AppBreadcrumbs from "@/components/layouts/settings/appBreadcrumbs";
 import {
   Box,
   Button,

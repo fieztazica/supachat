@@ -6,6 +6,7 @@ import {
   IconButton,
   Input,
   useDisclosure,
+  useForceUpdate,
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -16,6 +17,7 @@ function ChangeChannelNameButton({ channel }: { channel: Channel }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [value, setValue] = useState<string>(channel.name ?? "");
   const toast = useToast();
+  const forceUpdate = useForceUpdate();
 
   if (!user) return null;
 
@@ -32,6 +34,7 @@ function ChangeChannelNameButton({ channel }: { channel: Channel }) {
         console.error(error);
         toast({ title: error.message, status: "error" });
       }
+      forceUpdate()
     })();
   };
 

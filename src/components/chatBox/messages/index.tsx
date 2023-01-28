@@ -19,6 +19,7 @@ import {
   useBoolean,
   useColorModeValue,
   useDisclosure,
+  useForceUpdate,
   useToast,
 } from "@chakra-ui/react";
 import { isArray } from "@chakra-ui/utils";
@@ -51,6 +52,7 @@ function Messages({ channelId }: { channelId: number }) {
   const scrollDummyRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const hoverNewMessageBgColor = useColorModeValue("gray.100", "gray.900");
+  const forceUpdate = useForceUpdate()
 
   const isChatBoxScrolledToBottom =
     chatBoxRef.current &&
@@ -87,6 +89,7 @@ function Messages({ channelId }: { channelId: number }) {
           });
         } finally {
           setLoading.off();
+          forceUpdate();
         }
       };
 
@@ -127,6 +130,7 @@ function Messages({ channelId }: { channelId: number }) {
             },
             () => {
               getChannelUsers();
+              forceUpdate();
             }
           )
           .subscribe();
@@ -145,6 +149,7 @@ function Messages({ channelId }: { channelId: number }) {
             },
             (payload) => {
               setMessages((old) => [payload.new as Message, ...old]);
+              forceUpdate();
             }
           )
           .subscribe();
@@ -159,6 +164,7 @@ function Messages({ channelId }: { channelId: number }) {
   }, [channelId]);
 
   useEffect(() => {
+    forceUpdate();
     if (chatBoxPos === "bottom" || isChatBoxScrolledToBottom) {
       scrollToBottom();
       setNewMessage.off();
@@ -168,6 +174,7 @@ function Messages({ channelId }: { channelId: number }) {
   }, [messages]);
 
   useEffect(() => {
+    forceUpdate();
     // console.log(chatBoxPos);
     if (chatBoxPos === "bottom") {
       setNewMessage.off();
@@ -201,6 +208,7 @@ function Messages({ channelId }: { channelId: number }) {
           });
         } finally {
           setLoading.off();
+          forceUpdate();
         }
       })();
     }
