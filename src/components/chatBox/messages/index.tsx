@@ -5,11 +5,6 @@ import {
   Box,
   Button,
   Center,
-  Code,
-  Flex,
-  Link,
-  ListItem,
-  OrderedList,
   Spinner,
   Stack,
   Tag,
@@ -22,47 +17,47 @@ import {
   useForceUpdate,
   useToast,
 } from "@chakra-ui/react";
-import { isArray } from "@chakra-ui/utils";
-import moment from "moment";
 import { useRef, useState, useEffect } from "react";
-import Markdown from "markdown-to-jsx";
 import ChatInput from "./chatInput";
-import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import MessageComponent from "./message";
-import { lt } from "lodash";
 
-type MessageWithProfile = Message & {
-  profile: Profile | Profile[] | null;
-};
+type Author = { user_id: string; display_name: string; avatar_url: string };
 
 function Messages({ channelId }: { channelId: number }) {
   const { supabase, user } = useSupabase();
-  const [channelUsers, setChannelUsers] = useState<
-    | { user_id: string; display_name: string; avatar_url: string }[]
-    | null
-    | undefined
-  >([]);
+  const [channelUsers, setChannelUsers] = useState<Author[]>([]);
   const [isHover, setIsHover] = useState<boolean>(false);
+  const [isTypingUsers, setIsTypingUsers] = useState<Author[]>([]);
   const [chatBoxPos, setChatBoxPos] = useState<"top" | "bottom" | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useBoolean(true);
   const [isAtTop, setIsAtTop] = useState<boolean>(false);
   const toast = useToast();
   const [newMessage, setNewMessage] = useBoolean(false);
-  const scrollDummyRef = useRef<HTMLDivElement>(null);
+  // const scrollDummyRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const hoverNewMessageBgColor = useColorModeValue("gray.100", "gray.900");
-  const forceUpdate = useForceUpdate()
+  const forceUpdate = useForceUpdate();
 
   const isChatBoxScrolledToBottom =
     chatBoxRef.current &&
     chatBoxRef.current.scrollTop >=
       chatBoxRef.current.scrollHeight - chatBoxRef.current.offsetHeight;
 
-  const isChatBoxScrolledToTop =
-    chatBoxRef.current && chatBoxRef.current.scrollTop === 0;
+  // const isChatBoxScrolledToTop =
+  //   chatBoxRef.current && chatBoxRef.current.scrollTop === 0;
 
   useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase.channel(`#${channelId}`, {
+      config: {
+        presence: {
+          key: `${user.id}`,
+        },
+      },
+    });
+
     (async () => {
       const getMessages = async () => {
         try {
@@ -117,28 +112,8 @@ function Messages({ channelId }: { channelId: number }) {
         }
       };
 
-      const subscribeChannelUsersUpdate = async () => {
-        await supabase
-          .channel(`channelUsers:${channelId}`)
-          .on(
-            "postgres_changes",
-            {
-              event: "*",
-              schema: "public",
-              table: "members",
-              filter: `channel_id=eq.${channelId}`,
-            },
-            () => {
-              getChannelUsers();
-              forceUpdate();
-            }
-          )
-          .subscribe();
-      };
-
-      const subscribeMessageInsert = async () => {
-        await supabase
-          .channel(`#${channelId}`)
+      const subscribeChannelEvent = async () => {
+        await channel
           .on(
             "postgres_changes",
             {
@@ -152,16 +127,60 @@ function Messages({ channelId }: { channelId: number }) {
               forceUpdate();
             }
           )
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "members",
+              filter: `channel_id=eq.${channelId}`,
+            },
+            () => {
+              getChannelUsers();
+              forceUpdate();
+            }
+          )
+          .on("presence", { event: "sync" }, async () => {
+            const state = await channel.presenceState();
+            const userIds = await Object.keys(state);
+            const isTypingUsersArray = await channelUsers.filter(
+              (a) => a.user_id !== user.id && userIds.includes(a.user_id)
+            );
+
+            await setIsTypingUsers(isTypingUsersArray);
+
+            console.log("synced state", state);
+          })
           .subscribe();
+
+        /**
+           * async (status) => {
+            if (status === "SUBSCRIBED") {
+              await channel.track({ online_at: new Date().toISOString() });
+            }
+          }
+          */
       };
 
       await getChannelUsers();
       await getMessages();
-      await subscribeMessageInsert();
-      await subscribeChannelUsersUpdate();
+      await subscribeChannelEvent();
       await scrollToBottom();
+
+      document.addEventListener("keypress", keyPressListener);
     })();
-  }, [channelId]);
+    return () => {
+      channel.unsubscribe();
+      document.removeEventListener("keypress", keyPressListener);
+    };
+
+    function keyPressListener(event: KeyboardEvent) {
+      channel.track({ isTyping: Date.now() });
+      setTimeout(() => {
+        channel.untrack();
+      }, 10_000);
+    }
+  }, [channelId, user]);
 
   useEffect(() => {
     forceUpdate();
@@ -170,7 +189,7 @@ function Messages({ channelId }: { channelId: number }) {
       setNewMessage.off();
     } else {
       setNewMessage.on();
-    } 
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -214,16 +233,6 @@ function Messages({ channelId }: { channelId: number }) {
     }
   }, [chatBoxPos]);
 
-  function scrollToBottomDummy() {
-    if (scrollDummyRef.current) {
-      scrollDummyRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-        inline: "nearest",
-      });
-    }
-  }
-
   function scrollToBottom() {
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
@@ -252,7 +261,6 @@ function Messages({ channelId }: { channelId: number }) {
         ref={chatBoxRef}
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
-        // bgColor={chatBoxBgColor}
       >
         {loading && (
           <Center py={4}>
@@ -293,11 +301,18 @@ function Messages({ channelId }: { channelId: number }) {
           There is a new message!
         </Box>
       )}
+      {!!isTypingUsers.length && (
+        <Box pl={4}>
+          <Text as="span" fontWeight={"semibold"}>
+            {isTypingUsers.map((a) => a.display_name).join(", ")}
+          </Text>{" "}
+          is typing...
+        </Box>
+      )}
+
       {!!user && (
         <Box
-          // mt={newMessage ? undefined : 4}
           p={2}
-          // bg={bgColor}
           roundedTop={!newMessage ? "md" : undefined}
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}

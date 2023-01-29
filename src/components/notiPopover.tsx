@@ -84,7 +84,7 @@ function NotiPopover() {
 
         const fetchPendingEvent = async () => {
           await supabase
-            .channel(`pending:public:members:user_id=eq.${user.id}`)
+            .channel(`@${user.id}`)
             .on(
               "postgres_changes",
               {

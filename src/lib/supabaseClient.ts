@@ -62,8 +62,9 @@ export const useSupabase = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
 
   useEffect(() => {
+    if (!session?.user.id) return;
+    const channel = supabase.channel(`@${session.user.id}`);
     (async () => {
-      if (!session?.user.id) return;
       const getUserProfile = async () => {
         const { data: userProfile } = await supabase
           .from('profiles')
@@ -73,8 +74,7 @@ export const useSupabase = () => {
           .single();
 
         if (userProfile !== null) {
-          await supabase
-            .channel(`public:profiles:id=eq.${userProfile.id}`)
+          await channel
             .on(
               'postgres_changes',
               {
@@ -86,8 +86,7 @@ export const useSupabase = () => {
               (payload: RealtimePostgresChangesPayload<Profile>) => {
                 setProfile(payload.new as Profile)
               }
-            )
-            .subscribe()
+            );
           return userProfile
         } else {
           return null
@@ -108,10 +107,7 @@ export const useSupabase = () => {
               ? []
               : [userChannelsData];
 
-          await supabase
-            .channel(
-              `public:channels`
-            )
+          await channel
             .on(
               "postgres_changes",
               {
@@ -141,8 +137,7 @@ export const useSupabase = () => {
                   })
                 }
               }
-            )
-            .subscribe();
+            );
 
           return userChannels;
         } else {
@@ -151,8 +146,7 @@ export const useSupabase = () => {
       };
 
       const fetchChannelOnEvent = async () => {
-        await supabase
-          .channel(`active:public:members:user_id=eq.${session.user.id}`)
+        await channel
           .on(
             "postgres_changes",
             {
@@ -196,7 +190,6 @@ export const useSupabase = () => {
               })();
             }
           )
-          .subscribe();
       };
 
       setChannels(await getUserChannels());
@@ -204,6 +197,8 @@ export const useSupabase = () => {
 
       const userProfile = await getUserProfile()
       setProfile(userProfile)
+
+      await channel.subscribe()
     })()
   }, [session])
   return { profile, session, supabase, user, channels }

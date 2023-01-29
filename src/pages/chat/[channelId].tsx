@@ -30,7 +30,7 @@ import { useRouter } from "next/router";
 import { MdInfoOutline } from "react-icons/md";
 
 function Channel({ activeChannel, ...props }: { activeChannel: Channel }) {
-  const RightBarState = useDisclosure({ defaultIsOpen: true });
+  const RightBarState = useDisclosure();
   const { user, supabase, channels } = useSupabase();
   const borderColor = useColorModeValue("gray.200", "gray.700");
 
