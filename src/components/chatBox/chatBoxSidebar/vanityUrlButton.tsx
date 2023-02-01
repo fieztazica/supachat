@@ -10,9 +10,9 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { IoMdCheckmark } from "react-icons/io";
+import { IoMdCheckmark, IoMdLink } from "react-icons/io";
 
-function ChangeChannelNameButton({ channel }: { channel: Channel }) {
+function VanityUrlButton({ channel }: { channel: Channel }) {
   const { user, supabase, channels } = useSupabase();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [value, setValue] = useState<string>();
@@ -20,16 +20,16 @@ function ChangeChannelNameButton({ channel }: { channel: Channel }) {
   const forceUpdate = useForceUpdate();
 
   useEffect(() => {
-    setValue(channel.name ?? "");
+    setValue(channel.vanity_url ?? "");
   }, [channel, channels]);
 
   const handleOnClose = () => {
     onClose();
-    if (!!channel.name && value === channel.name) return;
+    if (!!channel.vanity_url && value === channel.vanity_url) return;
     (async () => {
       const { error } = await supabase
         .from("channels")
-        .update({ name: value })
+        .update({ vanity_url: value })
         .eq("id", channel.id);
 
       if (error) {
@@ -38,6 +38,15 @@ function ChangeChannelNameButton({ channel }: { channel: Channel }) {
       }
       forceUpdate();
     })();
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(
+      `${window.location.origin}/j/${channel.vanity_url}`
+    );
+    toast({
+      title: `Copied!`,
+    });
   };
 
   return (
@@ -59,12 +68,24 @@ function ChangeChannelNameButton({ channel }: { channel: Channel }) {
           />
         </Flex>
       ) : (
-        <Button w="100%" onClick={onOpen}>
-          Change channel name
-        </Button>
+        <Flex justifyContent={"space-between"} w="100%">
+          <Button w="100%" onClick={onOpen}>
+            {channel.vanity_url
+              ? `j/${channel.vanity_url}`
+              : "Set a vanity URL"}
+          </Button>
+          {channel.vanity_url && (
+            <IconButton
+              aria-label="Copy vanity URL Button"
+              ml={1}
+              onClick={handleCopy}
+              icon={<IoMdLink />}
+            />
+          )}
+        </Flex>
       )}
     </>
   );
 }
 
-export default ChangeChannelNameButton;
+export default VanityUrlButton;

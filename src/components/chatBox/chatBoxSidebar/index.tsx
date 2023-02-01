@@ -21,13 +21,14 @@ import ChangeChannelNameButton from "./changeChannelNameButton";
 import ChannelAvatar from "./channelAvatar";
 import ManageMembersModal from "./manageMembersModal";
 import ManageNicknamesModal from "./manageNicknamesModal";
+import VanityUrlButton from "./vanityUrlButton";
 
 function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
   const { user, supabase } = useSupabase();
   const toast = useToast();
   const router = useRouter();
-  const borderColor = useColorModeValue("gray.200", "gray.700")
-  const forceUpdate = useForceUpdate()
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const forceUpdate = useForceUpdate();
 
   if (!user) return null;
 
@@ -112,7 +113,7 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
       }
       //If not owner do a normal leave
       else leave();
-      
+
       forceUpdate();
     })();
   };
@@ -151,7 +152,7 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
       <Box w="$100vw" overflow={"auto"} p={4}>
         <VStack minW="$100vw">
           {/* <ChannelAvatar channel={channel} /> */}
-          <Avatar src={channel.avatar_url ?? undefined} as={Link} href={channel?.avatar_url} isExternal />
+          <Avatar src={channel.avatar_url ?? undefined} />
           <Text>{channel.name ?? channel.id}</Text>
           <Tag colorScheme={channel.is_private ? "purple" : "cyan"}>
             {channel.is_private ? `Private` : `Public`}
@@ -160,6 +161,7 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
 
           {channel.owner_id === user.id && (
             <>
+              <VanityUrlButton channel={channel} />
               <ChangeChannelNameButton channel={channel} />
               <ChangeChannelAvatarButton channel={channel} />
               <Button w="100%" onClick={togglePublicity}>
@@ -167,6 +169,7 @@ function ChannelRightBar({ channel, ...props }: { channel: Channel }) {
                   ? "Open channel to public"
                   : "Make channel private"}
               </Button>
+              <Divider />
             </>
           )}
           <ManageMembersModal channel={channel} />

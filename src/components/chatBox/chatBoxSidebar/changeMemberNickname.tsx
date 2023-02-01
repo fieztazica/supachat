@@ -12,7 +12,7 @@ import {
   HStack,
   Avatar,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 
 function ChangeMemberNickname({
@@ -27,9 +27,11 @@ function ChangeMemberNickname({
   const { supabase } = useSupabase();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
-  const [value, setValue] = useState<string>(
-    member.nickname ?? (member.profile as Profile).full_name ?? ""
-  );
+  const [value, setValue] = useState<string>();
+
+  useEffect(() => {
+    setValue(member.nickname ?? (member.profile as Profile).full_name ?? "");
+  }, [channel, member]);
 
   const handleOnClose = (userId: string) => {
     onClose();
