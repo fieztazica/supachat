@@ -24,24 +24,25 @@ const Home = () => {
   const { toggleColorMode, colorMode } = useColorMode();
   const { profile, supabase } = useSupabase();
 
-  useEffect(() => {
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      // console.log(event);
-      if (event == "PASSWORD_RECOVERY") {
-        const newPassword =
-          prompt("What would you like your new password to be?") || undefined;
-        const { data, error } = await supabase.auth.updateUser({
-          password: newPassword,
-        });
+  // useEffect(() => {
+  //   supabase.auth.onAuthStateChange(async (event, session) => {
+  //     console.log("HOME",event);
+  //     if (event == "PASSWORD_RECOVERY") {
+  //       console.log("HOME PASSWORD_RECOVERY", session);
+  //       // const newPassword =
+  //       //   prompt("What would you like your new password to be?") || undefined;
+  //       // const { data, error } = await supabase.auth.updateUser({
+  //       //   password: newPassword,
+  //       // });
 
-        if (data) alert("Password updated successfully!");
-        if (error) alert("There was an error updating your password.");
-      }
-    });
+  //       // if (data) alert("Password updated successfully!");
+  //       // if (error) alert("There was an error updating your password.");
+  //     }
+  //   });
 
-    // console.log(localStorage.getItem("chakra-ui-color-mode"))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //   // console.log(localStorage.getItem("chakra-ui-color-mode"))
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return (
     <Flex as={Container} direction="column" h="100vh">

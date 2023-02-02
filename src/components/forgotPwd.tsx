@@ -32,9 +32,9 @@ function ForgotPwd({ children }: { children: JSX.Element }) {
     onSubmit: async (values) => {
       const { data, error } = await supabase.auth.resetPasswordForEmail(
         `${values.email}`,
-        {
-          redirectTo: `${window.location.origin}/reset`,
-        }
+        // {
+        //   redirectTo: `${window.location.origin}/reset`,
+        // }
       );
 
       if (error) {
@@ -44,7 +44,7 @@ function ForgotPwd({ children }: { children: JSX.Element }) {
 
       if (data && !error) {
         toast({
-          title: `An mail has been sent!`,
+          title: `An email has been sent!`,
           description: ` Check your mailbox for next step!`,
           status: "success",
         });

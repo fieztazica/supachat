@@ -58,6 +58,23 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
+  useEffect(() => {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      console.log("APP",event);
+      if (event == "PASSWORD_RECOVERY") {
+        console.log("_APP PASSWORD_RECOVERY", session);
+        // const newPassword =
+        //   prompt("What would you like your new password to be?") || undefined;
+        // const { data, error } = await supabaseClient.auth.updateUser({
+        //   password: newPassword,
+        // });
+
+        // if (data) alert("Password updated successfully!");
+        // if (error) alert("There was an error updating your password.");
+      }
+    });
+  }, []);
+
   return (
     <>
       <Head>
